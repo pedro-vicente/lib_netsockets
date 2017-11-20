@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>lib_netsockets. HTTP client</title>
+<link rel="stylesheet" type="text/css" href="star.css" />
+</head>
+<body>
+<h1>lib_netsockets</h1>
+Pedro Vicente
+<hr>
+lib_netsockets is a set of C++ classes that use POSIX/Winsock sockets with implementation of TCP client/server using JSON messages, and HTTP, FTP clients.
+The following steps shown an example of a client/server exchange using JSON.
+<h1>HTTP client</h1>
+
+HTTP (Hypertext Transfer Protocol) is a request and response protocol, where a request is sent by a client to a server, and a response is sent from a server to a client.
+One of the reasons for its widespread success is probably its simplicity.
+<h2>HTTP request</h2>
+An HTTP request consists English based sequences of characters, divided in:
+<ul>
+<li>a method, to indicate the desired action to be performed. The HTTP/1.0 specification defined the GET, POST and HEAD methods</li>
+<li>the local path of the requested resource</li>
+<li>the version of HTTP being used</li>
+<li>several optional header lines with the format consisting of a colon separating the header and its value, the line is terminated by CRLF characters (i.e ASCII values 13 and 10)
+<pre class="json">
+<code>
+Header: value
+</code>
+</pre>
+</li>
+<li>a blank line (i.e. a CRLF by itself)</li>
+<li>an optional message body (e.g. a file)</li>
+</ul> 
+An example of a GET request, that requests a retrieval of the file located at the server path /data/hello.txt, using the HTTP/1.1 protocol, to a host with domain at 127.0.0.1 (i.e localhost) is
+<pre class="json">
+<code>
+GET /data/hello.txt HTTP/1.1
+Host: 127.0.0.1
+Connection: close
+</code>
+</pre>
+<h2>HTTP response</h2>
+Running the above request on a Microfost Windows IIS web server returns a response similar to
+<pre class="json">
+<code>
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Last-Modified: Thu, 25 Aug 2016 04:19:56 GMT
+Accept-Ranges: bytes
+ETag: "288e59ef87fed11:0"
+Server: Microsoft-IIS/7.5
+X-Powered-By: ASP.NET
+Date: Thu, 25 Aug 2016 04:20:21 GMT
+Connection: close
+Content-Length: 5
+
+hello
+
+</code>
+</pre>
+
+where the contents of the file /data/hello.txt can be seen on the response (the 5 byte sequence of characters 'hello').
+
+<h1>HTTP client usage</h1>
+A usage of the get() method implemented in lib_netsockets is
+<pre class="cpp">
+<code>
+http_t client(host_name, 80);
+client.get(path_name, verbose);
+</code>
+</pre>
+
+
+<h2>References</h2>
+<ul>
+<li>
+[RFC2616] Hypertext Transfer Protocol -- HTTP/1.1. https://tools.ietf.org/html/rfc2616
+</li>
+</ul>
+
+
+
+</body>
+</html>

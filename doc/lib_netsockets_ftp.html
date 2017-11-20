@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>lib_netsockets. FTP client</title>
+<link rel="stylesheet" type="text/css" href="star.css" />
+</head>
+<body>
+<h1>lib_netsockets</h1>
+Pedro Vicente
+<hr>
+lib_netsockets is a set of C++ classes that use POSIX/Winsock sockets with implementation of TCP client/server using JSON messages, and HTTP, FTP clients.
+The following steps shown an example of a client/server exchange using JSON.
+
+<h1>FTP client</h1>
+The File Transfer Protocol (FTP) is a network protocol used to transfer files between a client and server.
+FTP uses uses two separate control and data connections between client and server.
+An FTP conversation consists of requests sent by the client and responses sent by the server.
+An FTP request consists of a request verb, optionally, a space followed by a parameter, and CRLF characters (i.e ASCII values 13 and 10).
+The server responds over the control connection with three-digit status codes in ASCII with an optional text message.
+<p>
+Following, examples are shown for a request (color red) and response (color green) exchange for a USER, PASS, PASV, NLST, SIZE, RETR and QUIT requests.
+<h2>Connection</h2>
+After a connection is made, the server sends an initial response, called the greeting.
+<pre class="response">
+<code>
+220 (vsFTPd 3.0.2)
+
+</code>
+</pre>
+<h2>The USER verb</h2>
+A USER request has a parameter with a username. In this case, the response asks for a password.
+<pre class="request">
+<code>
+USER anonymous
+
+</code>
+</pre>
+<pre class="response">
+<code>
+331 Please specify the password.
+
+</code>
+</pre>
+<h2>The PASS verb</h2>
+A PASS request has a parameter with a password.
+
+<pre class="request">
+<code>
+PASS password
+
+</code>
+</pre>
+<pre class="response">
+<code>
+230 Login successful.
+
+</code>
+</pre>
+
+<h2>The PASV verb</h2>
+A PASV request asks the server to accept a data connection on a new TCP port selected by the server.
+
+<pre class="request">
+<code>
+PASV
+
+</code>
+</pre>
+<pre class="response">
+<code>
+227 Entering Passive Mode (100,200,300,400,202,12).
+
+</code>
+</pre>
+
+<h2>The NLST verb</h2>
+The NLST request asks the server to send the contents of a directory over the data connection already established by the client.
+<pre class="request">
+<code>
+NLST
+
+</code>
+</pre>
+<pre class="response">
+<code>
+150 Here comes the directory listing.
+
+</code>
+</pre>
+
+
+<pre class="response">
+<code>
+226 Directory send OK.
+
+</code>
+</pre>
+
+<h2>The SIZE verb</h2>
+The SIZE request asks the size of a file. The parameter is the file name. The response sends the size in bytes after the 3 digit response code 213.
+<pre class="request">
+<code>
+SIZE filename.txt
+
+</code>
+</pre>
+<pre class="response">
+<code>
+213 2
+
+</code>
+</pre>
+
+<h2>The RETR verb</h2>
+A RETR request asks the server to send the contents of a file over the data connection already established by the client. 
+The RETR parameter is a file name.
+<pre class="request">
+<code>
+RETR filename.txt
+
+</code>
+</pre>
+<pre class="response">
+<code>
+150 Opening BINARY mode data connection for filename.txt (2 bytes).
+
+</code>
+</pre>
+
+
+<pre class="response">
+<code>
+226 Transfer complete.
+
+</code>
+</pre>
+
+<h2>The QUIT verb</h2>
+A QUIT request terminates the connection.
+<pre class="request">
+<code>
+QUIT
+
+</code>
+</pre>
+<pre class="response">
+<code>
+221 Goodbye.
+
+</code>
+</pre>
+
+<h1>FTP client usage</h1>
+lib_netsockets FTP client usage that retrieves a file list from a FTP server, and retrieves the first file from the list is
+<pre class="cpp">
+<code>
+ftp_t ftp(host_name, 21);
+ftp.login(user_name, pass);
+ftp.get_file_list();
+if (ftp.m_file_nslt.size())
+{
+ ftp.get_file(ftp.m_file_nslt.at(0).c_str());
+}
+ftp.logout();
+</code>
+</pre>
+
+
+<h2>References</h2>
+<ul>
+<li>
+[RFC959] FILE TRANSFER PROTOCOL (FTP) https://tools.ietf.org/pdf/rfc959.pdf
+</li>
+</ul>
+
+
+
+</body>
+</html>
