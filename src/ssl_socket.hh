@@ -9,9 +9,11 @@
 #pragma comment(lib, "Ws2_32.lib")
 #else
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h> //hostent
 #endif
 #include <openssl/ssl.h>
 #include <openssl/err.h>

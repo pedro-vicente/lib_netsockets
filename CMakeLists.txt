@@ -156,7 +156,7 @@ if (OPENSSL_INCLUDE)
 
   if(OPENSSL_INCLUDE AND OPENSSL_LIBRARY AND CRYPTO_LIBRARY)
     message("-- Building SSL TCP example")
-    add_executable(ssl_client src/ssl_socket.cc examples/ssl_client.cc )
+    add_executable(ssl_client src/ssl_socket.cc src/ssl_socket.hh examples/ssl_client.cc )
     target_include_directories(ssl_client PRIVATE ${OPENSSL_INCLUDE})
     if (MSVC)
       set(LIBS ${LIBS} crypt32.lib)

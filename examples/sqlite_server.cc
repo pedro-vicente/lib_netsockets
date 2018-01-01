@@ -1,4 +1,5 @@
 #include <string>
+#include <string.h>
 #include <vector>
 #include <iostream>
 //local
@@ -200,7 +201,7 @@ int main(int argc, char *argv[])
 
   //construct request message using sql in body
   char buf_request[1024];
-  sprintf(buf_request, "POST / HTTP/1.1\r\nContent-Length: %d\r\nConnection: close\r\n\r\n%s",
+  sprintf(buf_request, "POST / HTTP/1.1\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n%s",
     strlen(json.c_str()), json.c_str());
 
   if (client.write_all(buf_request, strlen(buf_request)) < 0)
