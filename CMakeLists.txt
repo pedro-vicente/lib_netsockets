@@ -82,7 +82,7 @@ add_executable(ftp_client examples/ftp_client.cc ${SOURCES})
 add_executable(json_client examples/json_client.cc ${SOURCES})
 add_executable(json_server examples/json_server.cc ${SOURCES})
 target_include_directories(json_server PRIVATE external/gason/src)
-add_executable(http_coin examples/http_coin.cc ${SOURCES})
+add_executable(http_coin examples/http_coin.cc examples/coin.cc examples/coin.hh ${SOURCES})
 target_include_directories(http_coin PRIVATE external/gason/src)
 
 target_link_libraries (tcp_client ${LIBS})

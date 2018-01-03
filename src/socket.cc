@@ -254,7 +254,7 @@ int socket_t::read_all_get_close(const char *file_name, bool verbose)
 
     if (recv_size == 0)
     {
-      std::cout << "all bytes received " << std::endl;
+      if (verbose) std::cout << "all bytes received " << std::endl;
       break;
     }
 
