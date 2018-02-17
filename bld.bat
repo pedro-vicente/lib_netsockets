@@ -1,12 +1,10 @@
 
 @echo off
 if not defined DevEnvDir (
- echo "%VS140COMNTOOLS%VsDevCmd.bat" 
- call "%VS140COMNTOOLS%VsDevCmd.bat" 
- echo "%VCINSTALLDIR%vcvarsall.bat" 
- call "%VCINSTALLDIR%vcvarsall.bat" 
+ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
  if errorlevel 1 goto :eof
 )
+
 
 set root=%cd%
 :: replace the character string '\' with '/' needed for cmake

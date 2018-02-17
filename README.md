@@ -7,56 +7,34 @@ C++ light wrapper for POSIX and Winsock sockets using TCP. Examples include:
 * FTP client
 * SSL TCP client
 
-Dependencies (for SQLite server example)
+Dependencies 
 ------------
 
 [gason](https://github.com/vivkin/gason) (included)
 <br /> 
 
 [SQLite](https://www.sqlite.org/) (included)
-<br /> 
+<br />
+
+[OpenSSL](https://www.openssl.org/) ( included)
+<br />
 
 
-SSL TCP example
-------------
-[OpenSSL](https://www.openssl.org/) (not included)
-<br /> 
-
-Install OpenSSL
-
-Linux
-
-<pre>
-sudo apt-get install libssl-dev
-</pre>
-
-Windows
-
-<pre>
-perl Configure VC-WIN32 no-asm no-shared --debug --prefix=c:\ssl 
-nmake
-</pre>
-
-
-Building from source
+Building
 ------------
 
 Get source:
 <pre>
 git clone https://github.com/pedro-vicente/lib_netsockets.git
-</pre>
-
-Building with CMake
-------------
-<pre>
 cd build
 cmake ..
+make
 </pre>
 
-with optional OpenSSL location
-
+Building in Windows 
+------------
 <pre>
-cmake .. -DOPENSSL_INCLUDE=C:\ssl\include -DOPENSSL_LIBRARY=C:\ssl\lib\libssl.lib -DCRYPTO_LIBRARY=C:\ssl\lib\libcrypto.lib
+bld.bat
 </pre>
 
 # Usage
