@@ -13,7 +13,7 @@
 void usage()
 {
   std::cout << "usage: http_client -s SERVER -t 'HTTP_REQUEST' <-p PORT> <-v> <-h>" << std::endl;
-  std::cout << "-s SERVER: fully qualified web server name (default 127.0.0.1)" << std::endl;
+  std::cout << "-s SERVER: fully qualified web server name" << std::endl;
   std::cout << "-p PORT: server port (default 80)" << std::endl;
   std::cout << "-t 'HTTP_REQUEST', string enquoted" << std::endl;
   std::cout << "-v: verbose, output of retrieved file is printed" << std::endl;

@@ -95,6 +95,17 @@ Wed May 16 13:53:21 2018 server received: {"start_year":2017}
 Wed May 16 13:53:21 2018 server sent: {"next_year":2018}
 ```
 
+# HTTP client usage
+
+```
+usage: http_client -s SERVER -t 'HTTP_REQUEST' <-p PORT> <-v> <-h>
+-s SERVER: fully qualified web server name
+-p PORT: server port (default 80)
+-t 'HTTP_REQUEST', string enquoted
+-v: verbose, output of retrieved file is printed
+-h: help, exit
+```
+
 # HTTP REST example request
 
 Example REST API
@@ -105,10 +116,9 @@ https://jsonplaceholder.typicode.com/
 ./http_client -s jsonplaceholder.typicode.com -t "GET  /posts/1"
 ```
 
-request
+HTTP request
 
 ```
-client connected to: jsonplaceholder.typicode.com:80
 GET  /posts/1 HTTP/1.1
 Host: jsonplaceholder.typicode.com
 Accept: application/json
@@ -116,7 +126,7 @@ Connection: close
 ```
 
 
-response
+HTTP response
 
 ```
 HTTP/1.1 200 OK
