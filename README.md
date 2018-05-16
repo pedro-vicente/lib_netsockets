@@ -80,8 +80,18 @@ ftp.logout();
 # SQLite server/client example
 Send SQL commands as JSON array from TCP client to TCP server
 
-<pre>
+```
 CREATE TABLE IF NOT EXISTS table_places(place_id TEXT PRIMARY KEY NOT NULL,address CHAR(50) NOT NULL,rank INTEGER NOT NULL);
 INSERT INTO table_places VALUES('home', '102 E. Green St. Urbana IL 61801', 1);
 SELECT * FROM table_places WHERE place_id = 'home';
-</pre>
+```
+
+# TCP JSON server/client output
+
+```
+server listening on port 2001
+Wed May 16 13:53:21 2018 server accepted: 127.0.0.1 <260>
+Wed May 16 13:53:21 2018 server received: {"start_year":2017}
+Wed May 16 13:53:21 2018 server sent: {"next_year":2018}
+```
+

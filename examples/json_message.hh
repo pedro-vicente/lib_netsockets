@@ -1,0 +1,15 @@
+#ifndef LIB_NETSOCKET_JSON_MESSAGE_H
+#define LIB_NETSOCKET_JSON_MESSAGE_H
+
+#include "socket.hh"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//custom TCP message:
+//a header with size in bytes and # terminator
+//JSON text
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int write_request(socket_t &socket, const char* buf_json);
+std::string read_response(socket_t &socket);
+
+#endif

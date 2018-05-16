@@ -73,6 +73,8 @@ set(SOURCES ${SOURCES} src/ftp.hh)
 set(SOURCES ${SOURCES} src/ftp.cc)
 set(SOURCES ${SOURCES} external/gason/src/gason.h)
 set(SOURCES ${SOURCES} external/gason/src/gason.cpp)
+set(SOURCES ${SOURCES} examples/json_message.hh)
+set(SOURCES ${SOURCES} examples/json_message.cc)
 
 add_executable(tcp_client examples/tcp_client.cc ${SOURCES})
 add_executable(tcp_server examples/tcp_server.cc ${SOURCES})

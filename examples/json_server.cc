@@ -8,6 +8,7 @@
 #include <ctime>
 #include "socket.hh"
 #include "gason.h"
+#include "json_message.hh"
 
 unsigned short port = 2001;
 
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
     str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
     std::cout << prt_time() << "server accepted: " << str_ip << " <" << socket.m_socket_fd << "> " << std::endl;
 
-    std::string str_request = socket.read_json();
+    std::string str_request = read_response(socket);
     std::cout << prt_time() << "server received: " << str_request << std::endl;
     char* buf_request = strdup(str_request.c_str());
 
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
     json += std::to_string(year + 1);
     json += "}";
 
-    if (socket.write_json(json.c_str()) < 0)
+    if (write_request(socket, json.c_str()) < 0)
     {
     }
 

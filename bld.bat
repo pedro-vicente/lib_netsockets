@@ -25,8 +25,8 @@ if exist %root%\external\openssl-1.1.0g\libssl.lib (
   popd
 )
 
-
-cmake -H. -Bbuild ^
+set MSVC_VERSION="Visual Studio 14 2015 Win64"
+cmake -H. -Bbuild -G %MSVC_VERSION% ^
 -DOPENSSL_INCLUDE:PATH=%root_cmake%/ssl/include ^
 -DOPENSSL_LIBRARY:FILE=%root_cmake%/ssl/lib/libssl.lib ^
 -DCRYPTO_LIBRARY:FILE=%root_cmake%/ssl/lib/libcrypto.lib

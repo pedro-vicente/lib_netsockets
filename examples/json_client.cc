@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include "socket.hh"
+#include "json_message.hh"
 
 unsigned short port = 2001;
 
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
   //write request
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if (client.write_json(buf_json) < 0)
+  if (write_request(client, buf_json) < 0)
   {
   }
   std::cout << "client sent: ";
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
   //read response
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  std::string str_response = client.read_json();
+  std::string str_response = read_response(client);
   std::cout << "client received: ";
   std::cout << str_response << " " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
 
