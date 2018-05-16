@@ -95,3 +95,53 @@ Wed May 16 13:53:21 2018 server received: {"start_year":2017}
 Wed May 16 13:53:21 2018 server sent: {"next_year":2018}
 ```
 
+# HTTP REST example request
+
+Example REST API
+
+https://jsonplaceholder.typicode.com/
+
+```
+./http_client -s jsonplaceholder.typicode.com -t "GET  /posts/1"
+```
+
+request
+
+```
+client connected to: jsonplaceholder.typicode.com:80
+GET  /posts/1 HTTP/1.1
+Host: jsonplaceholder.typicode.com
+Accept: application/json
+Connection: close
+```
+
+
+response
+
+```
+HTTP/1.1 200 OK
+Date: Wed, 16 May 2018 22:34:45 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 292
+Connection: close
+Set-Cookie: __cfduid=d1f77010e32b4333f04dff766134fd4eb1526510085; expires=Thu, 16-May-19 22:34:45 GMT; path=/; domain=.typicode.com; HttpOnly
+X-Powered-By: Express
+Vary: Origin, Accept-Encoding
+Access-Control-Allow-Credentials: true
+Cache-Control: public, max-age=14400
+Pragma: no-cache
+Expires: Thu, 17 May 2018 02:34:45 GMT
+X-Content-Type-Options: nosniff
+Etag: W/"124-yiKdLzqO5gfBrJFrcdJ8Yq0LGnU"
+Via: 1.1 vegur
+CF-Cache-Status: HIT
+Server: cloudflare
+CF-RAY: 41c1503f5416241a-IAD
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}
+```

@@ -247,7 +247,8 @@ int socket_t::read_all_get_close(const char *file_name, bool verbose)
 
     if (-1 == recv_size)
     {
-      std::cout << "recv error: " << strerror(errno) << std::endl;
+      std::cout << "\nrecv error: " << strerror(errno) << std::endl;
+      return 0;
     }
 
     total_recv_size += recv_size;
