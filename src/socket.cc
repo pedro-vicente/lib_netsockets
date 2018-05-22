@@ -511,7 +511,7 @@ int socket_t::parse_http_headers(std::string &http_headers)
 //example: extract "Content-Length: 20"
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-unsigned long long http_extract_field(const std::string& str_field, const std::string& str_header)
+unsigned long long http_get_field(const std::string& str_field, const std::string& str_header)
 {
   size_t pos = str_header.find(str_field);
   if (pos == std::string::npos)
@@ -545,7 +545,7 @@ unsigned long long http_extract_field(const std::string& str_field, const std::s
 //return body part of HTTP response (take out HTPP headers)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string http_extract_body(const std::string& str_header)
+std::string http_get_body(const std::string& str_header)
 {
   std::string body;
 
@@ -560,6 +560,24 @@ std::string http_extract_body(const std::string& str_header)
 
   body = str_header.substr(pos + 4);
   return body;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//return HTTP method as a string (e.g GET, POST)
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string http_get_method(const std::string& str_header)
+{
+  std::string method;
+  size_t pos = str_header.find(" ");
+  if (pos == std::string::npos)
+  {
+    std::cout << "HTTP bad format" << std::endl;
+    std::cout << str_header << std::endl;
+    return method;
+  }
+  method = str_header.substr(0, pos);
+  return method;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -233,7 +233,7 @@ int get_coin(const std::string &coin_code, const std::string &date_end, bool ver
   std::ifstream ifs(fname, std::ios::binary);
   std::stringstream buf;
   buf << ifs.rdbuf();
-  std::string str_response = http_extract_body(buf.str());
+  std::string str_response = http_get_body(buf.str());
   std::string str_json;
 
   //some responses include extra characters at start ("408b\r\n") and end (after "}")

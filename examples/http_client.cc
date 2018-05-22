@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
   std::stringstream buf;
   buf << ifs.rdbuf();
   std::cout << buf.str();
-  std::string str_body = http_extract_body(buf.str());
+  std::string str_body = http_get_body(buf.str());
   std::ofstream ofs("response.json", std::ios::out | std::ios::binary);
   ofs.write(str_body.c_str(), str_body.size());
   ofs.close();

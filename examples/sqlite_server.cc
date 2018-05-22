@@ -89,7 +89,8 @@ int handle_client(socket_t& socket)
     return -1;
   }
 
-  unsigned long long size_body = http_extract_field("Content-Length: ", str_header);
+  std::string method = http_get_method(str_header);
+  unsigned long long size_body = http_get_field("Content-Length: ", str_header);
   std::cout << "received: Content-Length: " << size_body << std::endl;
 
   //now get body using size of Content-Length

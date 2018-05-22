@@ -53,7 +53,7 @@ int http_t::get(const char *path_remote_file, bool verbose)
     return -1;
   }
 
-  unsigned int size_body = (unsigned int)http_extract_field("Content-Length: ", http_headers);
+  unsigned int size_body = (unsigned int)http_get_field("Content-Length: ", http_headers);
   //read from socket with known size
   if (size_body)
   {
@@ -85,19 +85,15 @@ int http_t::get(const char *path_remote_file, bool verbose)
 int http_t::post(const std::string& str_body)
 {
   char buf[1024];
-
   //construct request message using class input parameters
   sprintf(buf, "POST / HTTP/1.1\r\nContent-Length: %d\r\nConnection: close\r\n\r\n%s",
     (int)str_body.size(), str_body.c_str());
-
   //send request, using built in tcp_client_t socket
   if (this->write_all(buf, strlen(buf)) < 0)
   {
     return -1;
   }
-
   std::cout << "request: " << buf << std::endl;
-
   return 0;
 }
 
