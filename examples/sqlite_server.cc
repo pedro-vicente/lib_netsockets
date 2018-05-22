@@ -163,8 +163,11 @@ int handle_sql(const std::string& sql)
     const unsigned char *address = sqlite3_column_text(stmt, 1);
     int rank = sqlite3_column_int(stmt, 2);
 
-    vec.push_back((char*)id);
-    std::cout << "id: " << id << std::endl;
+    std::string str((char*)id);
+    str += " ";
+    str += (char*)address;
+    vec.push_back(str);
+    std::cout << str.c_str() << std::endl;
   }
 
   //make JSON reply (an array of strings)
