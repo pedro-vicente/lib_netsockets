@@ -75,6 +75,8 @@ set(SOURCES ${SOURCES} external/gason/src/gason.h)
 set(SOURCES ${SOURCES} external/gason/src/gason.cpp)
 set(SOURCES ${SOURCES} examples/json_message.hh)
 set(SOURCES ${SOURCES} examples/json_message.cc)
+set(SOURCES ${SOURCES} examples/sql_message.hh)
+set(SOURCES ${SOURCES} examples/sql_message.cc)
 
 add_executable(tcp_client examples/tcp_client.cc ${SOURCES})
 add_executable(tcp_server examples/tcp_server.cc ${SOURCES})
@@ -97,15 +99,19 @@ target_link_libraries (json_server ${LIBS})
 target_link_libraries (http_coin ${LIBS})
 
 #///////////////////////////////////////////////////////
-#SQLite server example (uses JSON, SQLite)
+#SQLite server/client example (uses JSON, SQLite)
 #///////////////////////////////////////////////////////
 
 set(SOURCES ${SOURCES} external/sqlite-3.18.0/sqlite3.h)
 set(SOURCES ${SOURCES} external/sqlite-3.18.0/sqlite3.c)
 add_executable(sqlite_server examples/sqlite_server.cc ${SOURCES})
+add_executable(sqlite_client examples/sqlite_client.cc ${SOURCES})
 target_include_directories(sqlite_server PRIVATE external/sqlite-3.18.0)
 target_include_directories(sqlite_server PRIVATE external/gason/src)
 target_link_libraries (sqlite_server ${LIBS} ${CMAKE_DL_LIBS})
+target_include_directories(sqlite_client PRIVATE external/sqlite-3.18.0)
+target_include_directories(sqlite_client PRIVATE external/gason/src)
+target_link_libraries (sqlite_client ${LIBS} ${CMAKE_DL_LIBS})
 
 
 #///////////////////////////////////////////////////////
