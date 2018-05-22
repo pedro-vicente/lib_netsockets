@@ -70,9 +70,16 @@ std::string sql_t::insert_item(const char* item, const char* place)
 std::string sql_t::select_places(const char* place)
 {
   std::string sql;
-  sql += "SELECT * FROM table_places WHERE place_id = '";
-  sql += place;
-  sql += "';";
+  if (NULL == place)
+  {
+    sql += "SELECT * FROM table_places ;";
+  }
+  else
+  {
+    sql += "SELECT * FROM table_places WHERE place_id = '";
+    sql += place;
+    sql += "';";
+  }
   return sql.c_str();
 }
 
@@ -83,8 +90,15 @@ std::string sql_t::select_places(const char* place)
 std::string sql_t::select_items(const char* place)
 {
   std::string sql;
-  sql += "SELECT * FROM table_items WHERE place_id = '";
-  sql += place;
-  sql += "';";
+  if (NULL == place)
+  {
+    sql += "SELECT * FROM table_items ;";
+  }
+  else
+  {
+    sql += "SELECT * FROM table_items WHERE place_id = '";
+    sql += place;
+    sql += "';";
+  }
   return sql.c_str();
 }

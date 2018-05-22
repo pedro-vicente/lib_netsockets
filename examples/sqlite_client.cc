@@ -19,7 +19,7 @@ void usage()
   std::cout << "-c: create table places" << std::endl;
   std::cout << "-t: create table items" << std::endl;
   std::cout << "-p: insert place" << std::endl;
-  std::cout << "-i: insert item" << std::endl;
+  std::cout << "-i 'ITEM': insert item 'ITEM'" << std::endl;
   std::cout << "-g: get rows from table 'places'" << std::endl;
   std::cout << "-f: get rows from table 'items'" << std::endl;
   std::cout << "-a: create table,insert place,insert item" << std::endl;
@@ -35,22 +35,23 @@ int main(int argc, char *argv[])
   const char *buf_server = "127.0.0.1";
   unsigned short port = 3000;
   sql_action_t sql_action = sql_action_t::sql_none;
+  std::string item;
 
   if (argc == 1)
   {
     sql_action = sql_action_t::sql_all;
   }
 
-  for (int i = 1; i < argc && argv[i][0] == '-'; i++)
+  for (int idx = 1; idx < argc && argv[idx][0] == '-'; idx++)
   {
-    switch (argv[i][1])
+    switch (argv[idx][1])
     {
     case 'h':
       usage();
       break;
     case 'o':
-      port = atoi(argv[i + 1]);
-      i++;
+      port = atoi(argv[idx + 1]);
+      idx++;
       break;
     case 'c':
       sql_action = sql_action_t::sql_create_table;
@@ -63,6 +64,8 @@ int main(int argc, char *argv[])
       break;
     case 'i':
       sql_action = sql_action_t::sql_insert_item;
+      item = argv[idx + 1];
+      idx++;
       break;
     case 'g':
       sql_action = sql_action_t::sql_get_rows_places;
@@ -80,6 +83,9 @@ int main(int argc, char *argv[])
   //client
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if _MSC_VER
+  Sleep(500);
+#endif
   tcp_client_t client("127.0.0.1", 3000);
   if (client.open() < 0)
   {
@@ -117,18 +123,19 @@ int main(int argc, char *argv[])
     json += "\"";
     break;
   case sql_action_t::sql_insert_item:
+    assert(item.length());
     json += "\"";
-    json += sql.insert_item("it1", "home");
+    json += sql.insert_item(item.c_str(), "home");
     json += "\"";
     break;
   case sql_action_t::sql_get_rows_places:
     json += "\"";
-    json += sql.select_places("home");
+    json += sql.select_places(NULL);
     json += "\"";
     break;
   case sql_action_t::sql_get_rows_items:
     json += "\"";
-    json += sql.select_items("home");
+    json += sql.select_items(NULL);
     json += "\"";
     break;
   case sql_action_t::sql_all:

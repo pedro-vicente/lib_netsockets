@@ -31,16 +31,16 @@ int main(int argc, char *argv[])
   const char *buf_server = "127.0.0.1";
   unsigned short port = 3000;
 
-  for (int i = 1; i < argc && argv[i][0] == '-'; i++)
+  for (int idx = 1; idx < argc && argv[idx][0] == '-'; idx++)
   {
-    switch (argv[i][1])
+    switch (argv[idx][1])
     {
     case 'h':
       usage();
       break;
     case 'o':
-      port = atoi(argv[i + 1]);
-      i++;
+      port = atoi(argv[idx + 1]);
+      idx++;
       break;
     }
   }
@@ -156,14 +156,34 @@ int handle_sql(const std::string& sql)
     return SQLITE_ERROR;
   }
 
+  std::vector<std::string> vec;
   while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
   {
     const unsigned char *id = sqlite3_column_text(stmt, 0);
     const unsigned char *address = sqlite3_column_text(stmt, 1);
     int rank = sqlite3_column_int(stmt, 2);
 
+    vec.push_back((char*)id);
     std::cout << "id: " << id << std::endl;
   }
+
+  //make JSON reply (an array of strings)
+  std::string json = "[";
+  for (int idx = 0; idx < vec.size(); idx++)
+  {
+    json += "\"";
+    json += vec.at(idx);
+    json += "\"";
+    if (idx < vec.size() - 1)
+    {
+      json += ",";
+    }
+  }
+  json += "]";
+
+  std::ofstream ofs("response.json");
+  ofs << json.c_str();
+  ofs.close();
 
   if (sqlite3_finalize(stmt) != SQLITE_OK)
   {
