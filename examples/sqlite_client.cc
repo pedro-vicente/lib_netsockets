@@ -18,7 +18,7 @@ void usage()
   std::cout << "-o PORT: port (default 3000)" << std::endl;
   std::cout << "-c: create table places" << std::endl;
   std::cout << "-t: create table items" << std::endl;
-  std::cout << "-p: insert place" << std::endl;
+  std::cout << "-p PLACE: insert place 'PLACE'" << std::endl;
   std::cout << "-i 'ITEM': insert item 'ITEM'" << std::endl;
   std::cout << "-g: get rows from table 'places'" << std::endl;
   std::cout << "-f: get rows from table 'items'" << std::endl;
@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
   unsigned short port = 3000;
   sql_action_t sql_action = sql_action_t::sql_none;
   std::string item;
+  std::string place;
 
   if (argc == 1)
   {
@@ -61,6 +62,8 @@ int main(int argc, char *argv[])
       break;
     case 'p':
       sql_action = sql_action_t::sql_insert_place;
+      place = argv[idx + 1];
+      idx++;
       break;
     case 'i':
       sql_action = sql_action_t::sql_insert_item;
@@ -118,8 +121,9 @@ int main(int argc, char *argv[])
     json += "\"";
     break;
   case sql_action_t::sql_insert_place:
+    assert(place.length());
     json += "\"";
-    json += sql.insert_place("home");
+    json += sql.insert_place(place.c_str());
     json += "\"";
     break;
   case sql_action_t::sql_insert_item:

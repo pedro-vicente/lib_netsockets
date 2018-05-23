@@ -159,13 +159,15 @@ int handle_sql(const std::string& sql)
   std::vector<std::string> vec;
   while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
   {
-    const unsigned char *id = sqlite3_column_text(stmt, 0);
-    const unsigned char *address = sqlite3_column_text(stmt, 1);
-    int rank = sqlite3_column_int(stmt, 2);
+    const unsigned char *field_0 = sqlite3_column_text(stmt, 0);
+    const unsigned char *field_1 = sqlite3_column_text(stmt, 1);
+    int field_2 = sqlite3_column_int(stmt, 2);
 
-    std::string str((char*)id);
+    //unfortunately, sqlite3_column_int returns integer 0 for error
+
+    std::string str((char*)field_0);
     str += " ";
-    str += (char*)address;
+    str += (char*)field_1;
     vec.push_back(str);
     std::cout << str.c_str() << std::endl;
   }
