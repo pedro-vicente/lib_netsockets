@@ -8,7 +8,7 @@
 #include "gason.h"
 #include "sql_message.hh"
 
-int handle_sql(const std::string& sql);
+int handle_sql(const std::string& sql, std::string &json);
 int handle_client(socket_t& socket);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +92,16 @@ int handle_client(socket_t& socket)
   std::string method = http_get_method(str_header);
   unsigned long long size_body = http_get_field("Content-Length: ", str_header);
   std::cout << "received: Content-Length: " << size_body << std::endl;
+  if (size_body == 0)
+  {
+    std::string response("HTTP/1.1 200 OK\r\n\r\n");
+    response += "<html><body>Invalid request</body></html>";
+    if (socket.write_all(response.c_str(), response.size()) < 0)
+    {
+      std::cout << "write response error\n";
+    }
+    return 0;
+  }
 
   //now get body using size of Content-Length
   if (socket.read_all(buf, (int)size_body) < 0)
@@ -122,9 +132,29 @@ int handle_client(socket_t& socket)
   std::cout << std::endl << "Executing SQL to database..." << std::endl << std::endl;
 
   size_t nbr_sql = vec_sql.size();
+  std::string json;
   for (size_t idx = 0; idx < nbr_sql; idx++)
   {
-    handle_sql(vec_sql.at(idx));
+    if (handle_sql(vec_sql.at(idx), json) == SQLITE_ERROR)
+    {
+      return -1;
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //response
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  std::string response("HTTP/1.1 200 OK\r\n");
+  response += "Content-Type: application/json\r\n";
+  response += "Content-Length: ";
+  response += std::to_string(json.size());
+  response += "\r\n";
+  response += "\r\n"; //terminate HTTP headers
+  response += json;
+  if (socket.write_all(response.c_str(), response.size()) < 0)
+  {
+    std::cout << "write response error\n";
   }
 
   return 0;
@@ -134,7 +164,7 @@ int handle_client(socket_t& socket)
 //handle_sql
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int handle_sql(const std::string& sql)
+int handle_sql(const std::string& sql, std::string &json)
 {
   sqlite3 *db;
   sqlite3_stmt *stmt;
@@ -173,7 +203,7 @@ int handle_sql(const std::string& sql)
   }
 
   //make JSON reply (an array of strings)
-  std::string json = "[";
+  json = "[";
   for (int idx = 0; idx < vec.size(); idx++)
   {
     json += "\"";

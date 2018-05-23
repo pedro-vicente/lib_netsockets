@@ -8,6 +8,10 @@
 #include "gason.h"
 #include "sql_message.hh"
 
+
+std::string get_response(socket_t &socket);
+std::string parse_http_headers(socket_t socket);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,11 +190,97 @@ int main(int argc, char *argv[])
 
   std::cout << "client sent: \n" << buf_request << std::endl;
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //read response
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  std::string str_response = get_response(client);
+  std::cout << "client received: ";
+  std::cout << str_response << std::endl;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //close connection
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
   client.close_socket();
-
-
   return 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//get_response
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string get_response(socket_t &socket)
+{
+  int recv_size; // size in bytes received or -1 on error 
+
+  //get HTTP header
+  std::string header = parse_http_headers(socket);
+
+  //get size
+  unsigned int size_body = (unsigned int)http_get_field("Content-Length: ", header);
+
+  //read from socket with known size
+  if (size_body)
+  {
+    //read from socket with known size
+    char *buf = new char[size_body];
+    if (socket.read_all(buf, size_body) < 0)
+    {
+      std::cout << "recv error: " << strerror(errno) << std::endl;
+      return NULL;
+    }
+    std::string str_json(buf, size_body);
+    delete[] buf;
+    return str_json;
+  }
+
+  return NULL;
+}
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//parse_http_headers
+//MSG_PEEK
+//Peeks at an incoming message.The data is treated as unread and the next recv() or similar 
+//function shall still return this data.
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string parse_http_headers(socket_t socket)
+{
+  int recv_size; // size in bytes received or -1 on error 
+  const int size_buf = 4096;
+  char buf[size_buf];
+  std::string headers;
+
+  if ((recv_size = recv(socket.m_socket_fd, buf, size_buf, MSG_PEEK)) == -1)
+  {
+    std::cout << "recv error: " << strerror(errno) << std::endl;
+    return headers;
+  }
+
+  std::string str(buf);
+  size_t pos = str.find("\r\n\r\n");
+
+  if (pos == std::string::npos)
+  {
+    std::cout << "HTTP header bad format" << std::endl;
+    return headers;
+  }
+
+  headers = str.substr(0, pos + 4);
+  int header_len = static_cast<int>(pos + 4);
+
+  std::cout << headers.c_str() << std::endl;
+
+  //now get headers with the obtained size from socket
+  if ((recv_size = recv(socket.m_socket_fd, buf, header_len, 0)) == -1)
+  {
+    std::cout << "recv error: " << strerror(errno) << std::endl;
+  }
+
+  //sanity check
+  std::string str1(buf);
+  assert(str1 == str);
+  return headers;
+}
