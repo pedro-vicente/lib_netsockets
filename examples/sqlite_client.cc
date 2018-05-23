@@ -178,10 +178,30 @@ int main(int argc, char *argv[])
   ofs << json.c_str();
   ofs.close();
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
   //construct request message using sql in body
+  //separate between GET and POST methods
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
   char buf_request[1024];
-  sprintf(buf_request, "POST / HTTP/1.1\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n%s",
-    strlen(json.c_str()), json.c_str());
+
+  if (sql_action == sql_action_t::sql_get_rows_items)
+  {
+    sprintf(buf_request, "GET /items HTTP/1.1\r\n\r\n");
+  }
+  else if (sql_action == sql_action_t::sql_get_rows_places)
+  {
+    sprintf(buf_request, "GET /places HTTP/1.1\r\n\r\n");
+  }
+  else
+  {
+    sprintf(buf_request, "POST / HTTP/1.1\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n%s",
+      strlen(json.c_str()), json.c_str());
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //send
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   if (client.write_all(buf_request, strlen(buf_request)) < 0)
   {
@@ -228,14 +248,14 @@ std::string get_response(socket_t &socket)
     if (socket.read_all(buf, size_body) < 0)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
-      return NULL;
     }
     std::string str_json(buf, size_body);
     delete[] buf;
     return str_json;
   }
 
-  return NULL;
+  std::string str;
+  return str;
 }
 
 

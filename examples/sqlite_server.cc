@@ -80,65 +80,104 @@ int main(int argc, char *argv[])
 
 int handle_client(socket_t& socket)
 {
-  std::string str_header;
+  std::string header;
+  std::string json; //response
   char buf[4096];
 
-  if (socket.parse_http_headers(str_header) < 0)
+  if (socket.parse_http_headers(header) < 0)
   {
     std::cout << "parse_http_headers error\n";
     return -1;
   }
 
-  std::string method = http_get_method(str_header);
-  unsigned long long size_body = http_get_field("Content-Length: ", str_header);
-  std::cout << "received: Content-Length: " << size_body << std::endl;
-  if (size_body == 0)
+  std::string method = http_get_method(header);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //GET method
+  //send back JSON response
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (method.compare("GET") == 0)
   {
-    std::string response("HTTP/1.1 200 OK\r\n\r\n");
-    response += "<html><body>Invalid request</body></html>";
-    if (socket.write_all(response.c_str(), response.size()) < 0)
+    size_t start = header.find("/");
+    size_t end = header.find(" ", start);
+    std::string action = header.substr(start + 1, end - start - 1);
+    std::cout << "REST method: " << action << "\n";
+    std::string sql;
+    if (action.compare("items") == 0)
     {
-      std::cout << "write response error\n";
+      sql = "SELECT * FROM table_items ;";
     }
-    return 0;
-  }
-
-  //now get body using size of Content-Length
-  if (socket.read_all(buf, (int)size_body) < 0)
-  {
-    std::cout << "recv error: " << strerror(errno) << std::endl;
-    return -1;
-  }
-
-  char *endptr;
-  JsonValue value;
-  JsonAllocator allocator;
-  int status = jsonParse(buf, &endptr, &value, allocator);
-  if (status != JSON_OK)
-  {
-    std::cout << "invalid JSON format for " << buf << std::endl;
-    return -1;
-  }
-
-  std::cout << std::endl << "Parsing SQL in JSON..." << std::endl << std::endl;
-
-  //JSON is an array of strings, each string is a SQL statement
-  std::vector<std::string> vec_sql;
-  for (JsonNode *node = value.toNode(); node != nullptr; node = node->next)
-  {
-    vec_sql.push_back(node->value.toString());
-  }
-
-  std::cout << std::endl << "Executing SQL to database..." << std::endl << std::endl;
-
-  size_t nbr_sql = vec_sql.size();
-  std::string json;
-  for (size_t idx = 0; idx < nbr_sql; idx++)
-  {
-    if (handle_sql(vec_sql.at(idx), json) == SQLITE_ERROR)
+    else if (action.compare("places") == 0)
+    {
+      sql = "SELECT * FROM table_places ;";
+    }
+    if (handle_sql(sql, json) == SQLITE_ERROR)
     {
       return -1;
     }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //POST method
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  else if (method.compare("POST") == 0)
+  {
+    unsigned long long size_body = http_get_field("Content-Length: ", header);
+    std::cout << "received: Content-Length: " << size_body << std::endl;
+    if (size_body == 0)
+    {
+      std::string response("HTTP/1.1 200 OK\r\n\r\n");
+      response += "<html><body>Invalid request</body></html>";
+      if (socket.write_all(response.c_str(), response.size()) < 0)
+      {
+        std::cout << "write response error\n";
+      }
+      return 0;
+    }
+
+    //now get body using size of Content-Length
+    if (socket.read_all(buf, (int)size_body) < 0)
+    {
+      std::cout << "recv error: " << strerror(errno) << std::endl;
+      return -1;
+    }
+
+    char *endptr;
+    JsonValue value;
+    JsonAllocator allocator;
+    int status = jsonParse(buf, &endptr, &value, allocator);
+    if (status != JSON_OK)
+    {
+      std::cout << "invalid JSON format for " << buf << std::endl;
+      return -1;
+    }
+
+    std::cout << std::endl << "Parsing SQL in JSON..." << std::endl << std::endl;
+
+    //JSON is an array of strings, each string is a SQL statement
+    std::vector<std::string> vec_sql;
+    for (JsonNode *node = value.toNode(); node != nullptr; node = node->next)
+    {
+      vec_sql.push_back(node->value.toString());
+    }
+
+    std::cout << std::endl << "Executing SQL to database..." << std::endl << std::endl;
+
+    size_t nbr_sql = vec_sql.size();
+    for (size_t idx = 0; idx < nbr_sql; idx++)
+    {
+      if (handle_sql(vec_sql.at(idx), json) == SQLITE_ERROR)
+      {
+        return -1;
+      }
+    }
+  }
+  else
+  {
+    std::cout << "invalid HTTP header method: " << method.c_str() << "\n";
+    return -1;
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +195,6 @@ int handle_client(socket_t& socket)
   {
     std::cout << "write response error\n";
   }
-
   return 0;
 }
 
