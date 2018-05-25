@@ -8,9 +8,8 @@
 #include "gason.h"
 #include "sql_message.hh"
 
-
-std::string get_response(socket_t &socket);
-std::string parse_http_headers(socket_t socket);
+int get_response(socket_t &socket, std::string &response);
+int get_http_headers(socket_t &socket, std::string &header);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
@@ -211,12 +210,15 @@ int main(int argc, char *argv[])
   std::cout << "client sent: \n" << buf_request << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //read response
+  //read response if there is one
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  std::string str_response = get_response(client);
-  std::cout << "client received: ";
-  std::cout << str_response << std::endl;
+  std::string response;
+  if (get_response(client, response) > 0)
+  {
+    std::cout << "client received:\n";
+    std::cout << response << std::endl;
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //close connection
@@ -228,14 +230,19 @@ int main(int argc, char *argv[])
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //get_response
+//return value
+//0 nothing received
+//1 something received
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string get_response(socket_t &socket)
+int get_response(socket_t &socket, std::string &response)
 {
-  int recv_size; // size in bytes received or -1 on error 
-
   //get HTTP header
-  std::string header = parse_http_headers(socket);
+  std::string header;
+  if (get_http_headers(socket, header) == 0)
+  {
+    return 0;
+  }
 
   //get size
   unsigned int size_body = (unsigned int)http_get_field("Content-Length: ", header);
@@ -250,33 +257,42 @@ std::string get_response(socket_t &socket)
       std::cout << "recv error: " << strerror(errno) << std::endl;
     }
     std::string str_json(buf, size_body);
+    response = str_json;
     delete[] buf;
-    return str_json;
+    return 1;
   }
 
-  std::string str;
-  return str;
+  return 1;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //parse_http_headers
-//MSG_PEEK
-//Peeks at an incoming message.The data is treated as unread and the next recv() or similar 
-//function shall still return this data.
+//return value
+//0 nothing received
+//1 something received
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string parse_http_headers(socket_t socket)
+int get_http_headers(socket_t &socket, std::string &header)
 {
   int recv_size; // size in bytes received or -1 on error 
   const int size_buf = 4096;
   char buf[size_buf];
-  std::string headers;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //MSG_PEEK
+  //Peeks at an incoming message.The data is treated as unread and the next recv() or similar 
+  //function shall still return this data.
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   if ((recv_size = recv(socket.m_socket_fd, buf, size_buf, MSG_PEEK)) == -1)
   {
     std::cout << "recv error: " << strerror(errno) << std::endl;
-    return headers;
+    return -1;
+  }
+
+  if (recv_size == 0)
+  {
+    return 0;
   }
 
   std::string str(buf);
@@ -285,13 +301,11 @@ std::string parse_http_headers(socket_t socket)
   if (pos == std::string::npos)
   {
     std::cout << "HTTP header bad format" << std::endl;
-    return headers;
+    return -1;
   }
 
-  headers = str.substr(0, pos + 4);
+  header = str.substr(0, pos + 4);
   int header_len = static_cast<int>(pos + 4);
-
-  std::cout << headers.c_str() << std::endl;
 
   //now get headers with the obtained size from socket
   if ((recv_size = recv(socket.m_socket_fd, buf, header_len, 0)) == -1)
@@ -302,5 +316,11 @@ std::string parse_http_headers(socket_t socket)
   //sanity check
   std::string str1(buf);
   assert(str1 == str);
-  return headers;
+
+  size_t size_header = header.size();
+  size_t size_msg = str.size();
+  std::cout << "HTTP header size: " << size_header << std::endl;
+  std::cout << header.c_str() << std::endl;
+
+  return 1;
 }

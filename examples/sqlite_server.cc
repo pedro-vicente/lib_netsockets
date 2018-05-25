@@ -8,8 +8,9 @@
 #include "gason.h"
 #include "sql_message.hh"
 
-int handle_sql(const std::string& sql, std::string &json);
-int handle_client(socket_t& socket);
+int handle_sql(const std::string& db_path, const std::string& sql, std::string &json, std::string& sql_errmsg);
+int handle_client(socket_t& socket, const std::string& db_path);
+int send_http_response(socket_t& socket, std::string& msg);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
@@ -19,6 +20,7 @@ void usage()
 {
   std::cout << "-h: help, exit" << std::endl;
   std::cout << "-o PORT: port (default 3000)" << std::endl;
+  std::cout << "-d DATABASE: full path of SQLite databse file" << std::endl;
   exit(0);
 }
 
@@ -30,6 +32,7 @@ int main(int argc, char *argv[])
 {
   const char *buf_server = "127.0.0.1";
   unsigned short port = 3000;
+  std::string db_path;
 
   for (int idx = 1; idx < argc && argv[idx][0] == '-'; idx++)
   {
@@ -42,14 +45,36 @@ int main(int argc, char *argv[])
       port = atoi(argv[idx + 1]);
       idx++;
       break;
+    case 'd':
+      db_path = argv[idx + 1];
+      idx++;
+      break;
     }
   }
+
+  if (db_path.empty())
+  {
+    return 0;
+  }
+
+  sqlite3 *db;
+  std::cout << "server: database: " << db_path.c_str() << std::endl;
+  if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK)
+  {
+    std::string sql_errmsg = db_path;
+    sql_errmsg += sqlite3_errmsg(db);
+    std::cout << sql_errmsg << std::endl;
+    sqlite3_close(db);
+    return 1;
+  }
+  sqlite3_close(db);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //server
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   tcp_server_t server(port);
+
   std::cout << "server: listening on port " << port << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +89,7 @@ int main(int argc, char *argv[])
     char *str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
     std::cout << prt_time() << "server: accepted: " << str_ip << "," << socket.m_socket_fd << std::endl;
 
-    if (handle_client(socket) < 0)
+    if (handle_client(socket, db_path) < 0)
     {
 
     }
@@ -78,7 +103,7 @@ int main(int argc, char *argv[])
 //handle_client
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int handle_client(socket_t& socket)
+int handle_client(socket_t& socket, const std::string& db_path)
 {
   std::string header;
   std::string json; //response
@@ -104,6 +129,7 @@ int handle_client(socket_t& socket)
     std::string action = header.substr(start + 1, end - start - 1);
     std::cout << "REST method: " << action << "\n";
     std::string sql;
+    std::string msg;
     if (action.compare("items") == 0)
     {
       sql = "SELECT * FROM table_items ;";
@@ -112,8 +138,9 @@ int handle_client(socket_t& socket)
     {
       sql = "SELECT * FROM table_places ;";
     }
-    if (handle_sql(sql, json) == SQLITE_ERROR)
+    if (handle_sql(db_path, sql, json, msg) == SQLITE_ERROR)
     {
+      send_http_response(socket, msg);
       return -1;
     }
   }
@@ -128,12 +155,9 @@ int handle_client(socket_t& socket)
     std::cout << "received: Content-Length: " << size_body << std::endl;
     if (size_body == 0)
     {
-      std::string response("HTTP/1.1 200 OK\r\n\r\n");
-      response += "<html><body>Invalid request</body></html>";
-      if (socket.write_all(response.c_str(), response.size()) < 0)
-      {
-        std::cout << "write response error\n";
-      }
+      //send response to client
+      std::string msg("Invalid request");
+      send_http_response(socket, msg);
       return 0;
     }
 
@@ -168,8 +192,11 @@ int handle_client(socket_t& socket)
     size_t nbr_sql = vec_sql.size();
     for (size_t idx = 0; idx < nbr_sql; idx++)
     {
-      if (handle_sql(vec_sql.at(idx), json) == SQLITE_ERROR)
+      std::string msg;
+      if (handle_sql(db_path, vec_sql.at(idx), json, msg) == SQLITE_ERROR)
       {
+        //send response to client
+        send_http_response(socket, msg);
         return -1;
       }
     }
@@ -202,7 +229,7 @@ int handle_client(socket_t& socket)
 //handle_sql
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int handle_sql(const std::string& sql, std::string &json)
+int handle_sql(const std::string& db_path, const std::string& sql, std::string &json, std::string& sql_errmsg)
 {
   sqlite3 *db;
   sqlite3_stmt *stmt;
@@ -211,16 +238,18 @@ int handle_sql(const std::string& sql, std::string &json)
   std::cout << "SQL:" << std::endl;
   std::cout << sql.c_str() << std::endl;
 
-  if (sqlite3_open("test.sqlite", &db) != SQLITE_OK)
+  if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK)
   {
-    std::cout << sqlite3_errmsg(db);
+    sql_errmsg = db_path;
+    sql_errmsg += sqlite3_errmsg(db);
+    std::cout << sql_errmsg << std::endl;
     return SQLITE_ERROR;
   }
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, NULL) != SQLITE_OK)
   {
-    std::cout << sqlite3_errmsg(db);
-    sqlite3_close(db);
+    sql_errmsg = sqlite3_errmsg(db);
+    std::cout << sql_errmsg << std::endl;;
     return SQLITE_ERROR;
   }
 
@@ -260,7 +289,8 @@ int handle_sql(const std::string& sql, std::string &json)
 
   if (sqlite3_finalize(stmt) != SQLITE_OK)
   {
-    std::cout << sqlite3_errmsg(db) << std::endl;;
+    sql_errmsg = sqlite3_errmsg(db);
+    std::cout << sql_errmsg << std::endl;;
     sqlite3_close(db);
     return SQLITE_ERROR;
   }
@@ -268,3 +298,23 @@ int handle_sql(const std::string& sql, std::string &json)
   return SQLITE_OK;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//send_http_response 
+//send a HTTP message to client
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int send_http_response(socket_t& socket, std::string& msg)
+{
+  //send response to client
+  std::string response("HTTP/1.1 200 OK\r\n");
+  response += "Content-Length: ";
+  response += std::to_string(msg.size());
+  response += "\r\n";
+  response += "\r\n"; //terminate HTTP
+  response += msg;
+  if (socket.write_all(response.c_str(), response.size()) < 0)
+  {
+    std::cout << "write response error\n";
+  }
+  return 0;
+}
