@@ -4,7 +4,7 @@
 #include <string>
 #include <stdio.h>
 #include <string.h>
-
+#include "socket.hh"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
@@ -81,7 +81,30 @@ int main(int argc, char *argv[])
   host_name = uri.substr(start, end - start);
   std::cout << "host: " << host_name << std::endl;
 
+#if _MSC_VER
+  Sleep(500);
+#endif
 
+  tcp_client_t client(host_name.c_str(), port);
+  std::cout << "client connecting to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //create socket and open connection
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (client.open() < 0)
+  {
+    return 1;
+  }
+  std::cout << "client connected to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //close connection
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  client.close_socket();
+  std::cout << "client closed to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
   return 0;
 }
 
