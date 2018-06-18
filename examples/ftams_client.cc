@@ -6,6 +6,8 @@
 #include <string.h>
 #include "socket.hh"
 
+const std::string ftams_place("/FTAMSDeviceService/DeviceService.svc/Reports/GetMessages/");
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
 //File Transfer Access Management Services
@@ -68,9 +70,14 @@ int main(int argc, char *argv[])
     usage();
   }
 
+  //validate
+  std::size_t ftams_place_pos = uri.find(ftams_place, 0);
+  if (ftams_place_pos == std::string::npos)
+  {
+    usage();
+  }
+
   //parse URI 
-  std::string host_name;
-  std::string http_request;
   std::size_t start = uri.find("://", 0);
   if (start == std::string::npos)
   {
@@ -78,7 +85,7 @@ int main(int argc, char *argv[])
   }
   start += 3;
   std::size_t end = uri.find("/", start + 1);
-  host_name = uri.substr(start, end - start);
+  std::string host_name = uri.substr(start, end - start);
   std::cout << "host: " << host_name << std::endl;
 
 #if _MSC_VER
@@ -98,6 +105,26 @@ int main(int argc, char *argv[])
   }
   std::cout << "client connected to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //make and HTTP request
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //get API token
+  std::string api_token = uri.substr(ftams_place_pos);
+  std::string http_request = "GET ";
+  http_request += api_token;
+  http_request += " HTTP/1.1\r\n\r\n";
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //send
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (client.write_all(http_request.c_str(), http_request.size()) < 0)
+  {
+
+  }
+
+  std::cout << "client sent: \n" << http_request << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //close connection

@@ -82,6 +82,27 @@ int main(int argc, char *argv[])
 
 int handle_client(socket_t& socket)
 {
+  std::string header;
+
+  if (socket.parse_http_headers(header) < 0)
+  {
+    std::cout << "parse_http_headers error\n";
+    return -1;
+  }
+
+  std::string method = http_get_method(header);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //GET method
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (method.compare("GET") == 0)
+  {
+    size_t start = header.find("/");
+    size_t end = header.find(" ", start);
+    std::string action = header.substr(start + 1, end - start - 1);
+    std::cout << "REST method: " << action << "\n";
+  }
 
   return 0;
 }

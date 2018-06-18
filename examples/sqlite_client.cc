@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include "socket.hh"
-#include "sqlite3.h"
 #include "gason.h"
 #include "sql_message.hh"
 

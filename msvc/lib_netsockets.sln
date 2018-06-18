@@ -1,36 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ftams_client", "ftams_client.vcxproj", "{B1181FC6-B867-4774-9552-5209A70CC220}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ftams_server", "ftams_server.vcxproj", "{791A4DC4-3579-47CD-B37C-FE5E46103DCD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite_client", "sqlite_client.vcxproj", "{82288012-16EA-4FB2-9E91-EB0E816984A8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite_server", "sqlite_server.vcxproj", "{1CA70135-EA73-4FC4-B178-337A07729507}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B1181FC6-B867-4774-9552-5209A70CC220}.Debug|x64.ActiveCfg = Debug|x64
 		{B1181FC6-B867-4774-9552-5209A70CC220}.Debug|x64.Build.0 = Debug|x64
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Debug|x86.ActiveCfg = Debug|Win32
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Debug|x86.Build.0 = Debug|Win32
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Release|x64.ActiveCfg = Release|x64
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Release|x64.Build.0 = Release|x64
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Release|x86.ActiveCfg = Release|Win32
-		{B1181FC6-B867-4774-9552-5209A70CC220}.Release|x86.Build.0 = Release|Win32
 		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Debug|x64.ActiveCfg = Debug|x64
 		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Debug|x64.Build.0 = Debug|x64
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Debug|x86.ActiveCfg = Debug|Win32
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Debug|x86.Build.0 = Debug|Win32
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Release|x64.ActiveCfg = Release|x64
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Release|x64.Build.0 = Release|x64
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Release|x86.ActiveCfg = Release|Win32
-		{791A4DC4-3579-47CD-B37C-FE5E46103DCD}.Release|x86.Build.0 = Release|Win32
+		{82288012-16EA-4FB2-9E91-EB0E816984A8}.Debug|x64.ActiveCfg = Debug|x64
+		{82288012-16EA-4FB2-9E91-EB0E816984A8}.Debug|x64.Build.0 = Debug|x64
+		{1CA70135-EA73-4FC4-B178-337A07729507}.Debug|x64.ActiveCfg = Debug|x64
+		{1CA70135-EA73-4FC4-B178-337A07729507}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
