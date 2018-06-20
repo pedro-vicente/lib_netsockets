@@ -12,19 +12,16 @@ int get_http_headers(socket_t &socket, std::string &header);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
+//-u http://127.0.0.1/get_places
+//-u http://127.0.0.1/get_items
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void usage()
 {
+  std::cout << "usage: sqlite_client -u URI <-p PORT> <-h>" << std::endl;
+  std::cout << "-u URI" << std::endl;
   std::cout << "-h: help, exit" << std::endl;
   std::cout << "-o PORT: port (default 3000)" << std::endl;
-  std::cout << "-c: create table places" << std::endl;
-  std::cout << "-t: create table items" << std::endl;
-  std::cout << "-p PLACE: insert place 'PLACE'" << std::endl;
-  std::cout << "-i 'ITEM': insert item 'ITEM'" << std::endl;
-  std::cout << "-g: get rows from table 'places'" << std::endl;
-  std::cout << "-f: get rows from table 'items'" << std::endl;
-  std::cout << "-a: create table,insert place,insert item" << std::endl;
   exit(0);
 }
 
@@ -34,16 +31,11 @@ void usage()
 
 int main(int argc, char *argv[])
 {
-  const char *buf_server = "127.0.0.1";
+  std::string uri;
   unsigned short port = 3000;
-  sql_action_t sql_action = sql_action_t::sql_none;
+  sql_action_t sql_action = sql_action_t::none;
   std::string item;
   std::string place;
-
-  if (argc == 1)
-  {
-    sql_action = sql_action_t::sql_all;
-  }
 
   for (int idx = 1; idx < argc && argv[idx][0] == '-'; idx++)
   {
@@ -56,30 +48,9 @@ int main(int argc, char *argv[])
       port = atoi(argv[idx + 1]);
       idx++;
       break;
-    case 'c':
-      sql_action = sql_action_t::sql_create_table;
-      break;
-    case 't':
-      sql_action = sql_action_t::sql_create_table_items;
-      break;
-    case 'p':
-      sql_action = sql_action_t::sql_insert_place;
-      place = argv[idx + 1];
+    case 'u':
+      uri = argv[idx + 1];
       idx++;
-      break;
-    case 'i':
-      sql_action = sql_action_t::sql_insert_item;
-      item = argv[idx + 1];
-      idx++;
-      break;
-    case 'g':
-      sql_action = sql_action_t::sql_get_rows_places;
-      break;
-    case 'f':
-      sql_action = sql_action_t::sql_get_rows_items;
-      break;
-    case 'a':
-      sql_action = sql_action_t::sql_all;
       break;
     }
   }
@@ -88,18 +59,72 @@ int main(int argc, char *argv[])
   //client
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if _MSC_VER
-  Sleep(500);
-#endif
-  tcp_client_t client("127.0.0.1", 3000);
-  if (client.open() < 0)
+
+  //parse URI 
+  std::size_t start = uri.find("://", 0);
+  if (start == std::string::npos)
   {
-    std::string  str = "connect error to: ";
-    str += buf_server;
-    std::cout << str << std::endl;
-    return 1;
+    usage();
   }
-  std::cout << "client: connected to: " << buf_server << ":" << port << std::endl;
+  start += 3;
+  std::size_t end = uri.find("/", start + 1);
+  std::string host_name = uri.substr(start, end - start);
+  std::cout << "host: " << host_name << std::endl;
+
+  //get API token
+  std::string api_token = uri.substr(end);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //generate SQL from API
+  //API:
+  // /get_places
+  // /get_items
+  // /create_table_places
+  // /create_table_items
+  // /insert_place
+  // /insert_item
+  // /select_places
+  // /select_items
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if (api_token.compare("/get_places") == 0)
+  {
+    sql_action = sql_action_t::get_places;
+  }
+  else if (api_token.compare("/get_items") == 0)
+  {
+    sql_action = sql_action_t::get_items;
+  }
+  else if (api_token.compare("/create_table_places") == 0)
+  {
+    sql_action = sql_action_t::create_table_places;
+  }
+  else if (api_token.compare("/create_table_items") == 0)
+  {
+    sql_action = sql_action_t::create_table_items;
+  }
+  else if (api_token.find("/insert_place/") != std::string::npos)
+  {
+    sql_action = sql_action_t::insert_place;
+    place = api_token.substr(std::string("/insert_place/").size());
+  }
+  else if (api_token.find("/insert_item/") != std::string::npos)
+  {
+    sql_action = sql_action_t::insert_item;
+    item = api_token.substr(std::string("/insert_item/").size());
+  }
+  else if (api_token.compare("/select_places") == 0)
+  {
+    sql_action = sql_action_t::select_places;
+  }
+  else if (api_token.compare("/select_places") == 0)
+  {
+    sql_action = sql_action_t::insert_item;
+  }
+  else if (api_token.compare("/select_items") == 0)
+  {
+    sql_action = sql_action_t::select_items;
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //make sql and JSON (an array of strings)
@@ -109,42 +134,42 @@ int main(int argc, char *argv[])
   sql_t sql;
   switch (sql_action)
   {
-  case sql_action_t::sql_none:
+  case sql_action_t::none:
     usage();
     return 0;
-  case sql_action_t::sql_create_table:
+  case sql_action_t::create_table_places:
     json += "\"";
     json += sql.create_table_places();
     json += "\"";
     break;
-  case sql_action_t::sql_create_table_items:
+  case sql_action_t::create_table_items:
     json += "\"";
     json += sql.create_table_items();
     json += "\"";
     break;
-  case sql_action_t::sql_insert_place:
+  case sql_action_t::insert_place:
     assert(place.length());
     json += "\"";
     json += sql.insert_place(place.c_str());
     json += "\"";
     break;
-  case sql_action_t::sql_insert_item:
+  case sql_action_t::insert_item:
     assert(item.length());
     json += "\"";
     json += sql.insert_item(item.c_str(), "home");
     json += "\"";
     break;
-  case sql_action_t::sql_get_rows_places:
+  case sql_action_t::select_places:
     json += "\"";
     json += sql.select_places(NULL);
     json += "\"";
     break;
-  case sql_action_t::sql_get_rows_items:
+  case sql_action_t::select_items:
     json += "\"";
     json += sql.select_items(NULL);
     json += "\"";
     break;
-  case sql_action_t::sql_all:
+  case sql_action_t::all:
     json += "\"";
     json += sql.create_table_places();
     json += "\"";
@@ -177,25 +202,43 @@ int main(int argc, char *argv[])
   ofs.close();
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //make HTTP request
   //construct request message using sql in body
   //separate between GET and POST methods
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   char buf_request[1024];
 
-  if (sql_action == sql_action_t::sql_get_rows_items)
+  if (sql_action == sql_action_t::get_items)
   {
-    sprintf(buf_request, "GET /items HTTP/1.1\r\n\r\n");
+    sprintf(buf_request, "GET /get_items HTTP/1.1\r\n\r\n");
   }
-  else if (sql_action == sql_action_t::sql_get_rows_places)
+  else if (sql_action == sql_action_t::get_places)
   {
-    sprintf(buf_request, "GET /places HTTP/1.1\r\n\r\n");
+    sprintf(buf_request, "GET /get_places HTTP/1.1\r\n\r\n");
   }
   else
   {
     sprintf(buf_request, "POST / HTTP/1.1\r\nContent-Length: %zu\r\nConnection: close\r\n\r\n%s",
       strlen(json.c_str()), json.c_str());
   }
+
+
+#if _MSC_VER
+  Sleep(500);
+#endif
+
+  tcp_client_t client(host_name.c_str(), port);
+  std::cout << "client connecting to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+
+  if (client.open() < 0)
+  {
+    std::string  str = "connect error to: ";
+    str += host_name;
+    std::cout << str << std::endl;
+    return 1;
+  }
+  std::cout << "client: connected to: " << host_name << ":" << port << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //send

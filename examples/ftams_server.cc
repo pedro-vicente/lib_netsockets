@@ -90,18 +90,43 @@ int handle_client(socket_t& socket)
     return -1;
   }
 
-  std::string method = http_get_method(header);
+  //parse header
+  size_t start = header.find("/");
+  size_t end = header.find(" ", start);
+  std::string action = header.substr(start + 1, end - start - 1);
+  std::cout << "REST method: " << action << "\n";
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //GET method
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  std::string method = http_get_method(header);
   if (method.compare("GET") == 0)
   {
-    size_t start = header.find("/");
-    size_t end = header.find(" ", start);
-    std::string action = header.substr(start + 1, end - start - 1);
-    std::cout << "REST method: " << action << "\n";
+
+  }
+  else if (method.compare("POST") == 0)
+  {
+
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //response
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  std::string resp_buf;
+  resp_buf = action;
+
+  std::string response("HTTP/1.1 200 OK\r\n");
+  response += "Content-Type: application/json\r\n";
+  response += "Content-Length: ";
+  response += std::to_string(resp_buf.size());
+  response += "\r\n";
+  response += "\r\n"; //terminate HTTP headers
+  response += resp_buf;
+  if (socket.write_all(response.c_str(), response.size()) < 0)
+  {
+    std::cout << "write response error\n";
   }
 
   return 0;

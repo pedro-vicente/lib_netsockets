@@ -78,7 +78,30 @@ ftp.logout();
 ```
 
 # SQLite server/client example
-Send SQL commands as JSON array from TCP client to TCP server
+
+
+THis example provides a REST API to send SQL commands as a JSON array from a TCP client to TCP server.
+The example consists of a SQLite database with 2 tables "places" (like your favorite places) and "items" (like items for each place).
+This database resides on the server. API is
+
+```
+/get_places
+/get_items
+/create_table_places
+/create_table_items
+/insert_place
+/insert_item
+/select_places
+/select_items
+```
+
+Example call:
+
+```
+./sqlite_client -u http://127.0.0.1/create_table_places
+```
+
+sqlite_client generates the following SQL, and encodes it in JSON, sending it as a HTTP POST
 
 ```
 CREATE TABLE IF NOT EXISTS table_places(place_id TEXT PRIMARY KEY NOT NULL,address CHAR(50) NOT NULL,rank INTEGER NOT NULL);
@@ -86,7 +109,23 @@ INSERT INTO table_places VALUES('home', '102 E. Green St. Urbana IL 61801', 1);
 SELECT * FROM table_places WHERE place_id = 'home';
 ```
 
+HTTP GET calls are 
+
+```
+/get_places
+/get_items
+```
+
+These can be done in a browser, e.g
+
+```
+http://127.0.0.1/get_places
+```
+
+will cause the server to send all rows from table "places" to the browser as a HTTP json response
+
 # TCP JSON server/client output
+
 
 ```
 server listening on port 2001

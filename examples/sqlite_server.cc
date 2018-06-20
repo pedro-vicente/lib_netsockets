@@ -18,9 +18,9 @@ int send_http_response(socket_t& socket, std::string& msg);
 
 void usage()
 {
-  std::cout << "-h: help, exit" << std::endl;
+  std::cout << "-h help, exit" << std::endl;
   std::cout << "-o PORT: port (default 3000)" << std::endl;
-  std::cout << "-d DATABASE: full path of SQLite databse file" << std::endl;
+  std::cout << "-d DATABASE: full path of SQLite database file" << std::endl;
   exit(0);
 }
 
@@ -30,7 +30,6 @@ void usage()
 
 int main(int argc, char *argv[])
 {
-  const char *buf_server = "127.0.0.1";
   unsigned short port = 3000;
   std::string db_path;
 
@@ -54,7 +53,8 @@ int main(int argc, char *argv[])
 
   if (db_path.empty())
   {
-    return 0;
+    std::cout << "database path missing" << std::endl;
+    return 1;
   }
 
   sqlite3 *db;
@@ -64,8 +64,6 @@ int main(int argc, char *argv[])
     std::string sql_errmsg = db_path;
     sql_errmsg += sqlite3_errmsg(db);
     std::cout << sql_errmsg << std::endl;
-    sqlite3_close(db);
-    return 1;
   }
   sqlite3_close(db);
 
@@ -130,11 +128,11 @@ int handle_client(socket_t& socket, const std::string& db_path)
     std::cout << "REST method: " << action << "\n";
     std::string sql;
     std::string msg;
-    if (action.compare("items") == 0)
+    if (action.compare("get_items") == 0)
     {
       sql = "SELECT * FROM table_items ;";
     }
-    else if (action.compare("places") == 0)
+    else if (action.compare("get_places") == 0)
     {
       sql = "SELECT * FROM table_places ;";
     }

@@ -6,14 +6,16 @@
 //type of sql action to do
 enum class sql_action_t
 {
-  sql_none,
-  sql_create_table,
-  sql_create_table_items,
-  sql_insert_place,
-  sql_insert_item,
-  sql_get_rows_places,
-  sql_get_rows_items,
-  sql_all
+  none,
+  create_table_places,
+  create_table_items,
+  insert_place,
+  insert_item,
+  get_places,
+  get_items,
+  select_places,
+  select_items,
+  all
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
