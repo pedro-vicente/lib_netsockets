@@ -11,6 +11,7 @@
 
 bool verbose = true;
 int handle_client(socket_t& socket);
+int send_http_response(socket_t& socket, std::string& msg);
 
 void usage()
 {
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
 int handle_client(socket_t& socket)
 {
   std::string header;
+  char buf[4096];
 
   if (socket.parse_http_headers(header) < 0)
   {
@@ -105,9 +107,38 @@ int handle_client(socket_t& socket)
   {
 
   }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //POST method
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
   else if (method.compare("POST") == 0)
   {
+    unsigned long long size_body = http_get_field("Content-Length: ", header);
+    std::cout << "received: Content-Length: " << size_body << std::endl;
+    if (size_body == 0)
+    {
+      //send response to client
+      std::string msg("Invalid request");
+      send_http_response(socket, msg);
+      return 0;
+    }
 
+    //now get body using size of Content-Length
+    if (socket.read_all(buf, (int)size_body) < 0)
+    {
+      std::cout << "recv error: " << strerror(errno) << std::endl;
+      return -1;
+    }
+
+    buf[size_body] = '\0';
+    std::string message(buf);
+    std::cout << "received message:" << std::endl;
+    std::cout << message;
+  }
+  else
+  {
+    std::cout << "invalid HTTP header method: " << method.c_str() << "\n";
+    return -1;
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +160,28 @@ int handle_client(socket_t& socket)
     std::cout << "write response error\n";
   }
 
+  return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//send_http_response 
+//send a HTTP message to client
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int send_http_response(socket_t& socket, std::string& msg)
+{
+  //send response to client
+  std::string response("HTTP/1.1 200 OK\r\n");
+  response += "Content-Length: ";
+  response += std::to_string(msg.size());
+  response += "\r\n";
+  response += "\r\n"; //terminate HTTP
+  response += msg;
+  if (socket.write_all(response.c_str(), response.size()) < 0)
+  {
+    std::cout << "write response error\n";
+  }
   return 0;
 }
 

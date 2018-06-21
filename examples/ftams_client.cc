@@ -9,12 +9,13 @@
 
 int get_response(socket_t &socket, std::string &response);
 int get_http_headers(socket_t &socket, std::string &header);
-const std::string ftams_place("/FTAMSDeviceService/DeviceService.svc/Reports/GetMessages/");
+const std::string ftams_place("/FTAMSDeviceService/DeviceService.svc/Reports");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
 //File Transfer Access Management Services
 //-u http://127.0.0.1/FTAMSDeviceService/DeviceService.svc/Reports/GetMessages/3
+//-u http://127.0.0.1/FTAMSDeviceService/DeviceService.svc/Reports/PostMessage
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void usage()
@@ -91,6 +92,40 @@ int main(int argc, char *argv[])
   std::string host_name = uri.substr(start, end - start);
   std::cout << "host: " << host_name << std::endl;
 
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //make HTTP request
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  std::string http_request;
+  std::string message;
+  message = "test";
+
+  //get API token
+  std::string api_token = uri.substr(ftams_place_pos + ftams_place.size());
+  std::string get_messages_nbr;
+  if (api_token.find("/GetMessages/") != std::string::npos)
+  {
+    get_messages_nbr = api_token.substr(std::string("/GetMessages/").size());
+    http_request += "GET ";
+    http_request += api_token;
+    http_request += " HTTP/1.1\r\n";
+    http_request += "\r\n"; //terminate HTTP header
+  }
+  else if (api_token.compare("/PostMessage") == 0)
+  {
+    http_request += "POST ";
+    http_request += api_token;
+    http_request += " HTTP/1.1\r\n";
+    http_request += "Content-Length: ";
+    http_request += std::to_string(message.size());
+    http_request += "\r\n";
+    http_request += "Connection: close\r\n";
+    http_request += "\r\n"; //terminate HTTP header
+    //add message
+    http_request += message;
+  }
+
 #if _MSC_VER
   Sleep(500);
 #endif
@@ -108,15 +143,6 @@ int main(int argc, char *argv[])
   }
   std::cout << "client connected to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //make HTTP request
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //get API token
-  std::string api_token = uri.substr(ftams_place_pos);
-  std::string http_request = "GET ";
-  http_request += api_token;
-  http_request += " HTTP/1.1\r\n\r\n";
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //send
