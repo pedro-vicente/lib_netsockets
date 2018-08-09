@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "ssl_socket.hh"
+#include "openssl_socket.hh"
 
 int main(int argc, char *argv[])
 {
