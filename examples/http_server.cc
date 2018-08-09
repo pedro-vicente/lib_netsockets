@@ -105,15 +105,29 @@ int handle_client(socket_t& socket)
   //response
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  std::string str_response("HTTP/1.1 200 OK\r\n\r\n");
-  str_response += "<html><body><h1>Server</h1></body></html>";
+  std::string str("HTTP/1.1 200 OK\r\n\r\n");
+  str += "<!doctype html><html>";
+  str += "<head>";
+  str += "</head>";
+  str += "<body>server<div id='div_id'></div>";
+  str += "<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>";
+  str += "<script>";
+  str += "var trace1 = {";
+  str += "x: [2, 3, 4, 5],";
+  str += "y: [16, 5, 11, 10],";
+  str += "mode: 'lines+markers'";
+  str += "};";
+  str += "var data = [trace1];";
+  str += "var layout = {};";
+  str += "Plotly.newPlot('div_id', data, layout);";
+  str += "</script></body></html>";
 
   if (verbose)
   {
-    std::cout << str_response << std::endl;
+    std::cout << str << std::endl;
   }
 
-  if (socket.write_all(str_response.c_str(), str_response.size()) < 0)
+  if (socket.write_all(str.c_str(), str.size()) < 0)
   {
     std::cout << "write response error\n";
     return -1;

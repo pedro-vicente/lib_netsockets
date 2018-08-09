@@ -119,15 +119,12 @@ int ssl_socket_t::open(const char *host_name)
   {
     return -1;
   }
-
-  m_socket_ssl = SSL_get_fd(m_ssl);
   SSL_set_fd(m_ssl, m_socket_fd);
   int err = SSL_connect(m_ssl);
   if (err <= 0)
   {
     return -1;
   }
-
   return 0;
 }
 

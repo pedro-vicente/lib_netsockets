@@ -40,7 +40,6 @@ public:
 protected:
   int parse_http_headers();
   SSL *m_ssl;
-  int m_socket_ssl;
   int m_socket_fd;
 };
 
