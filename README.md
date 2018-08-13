@@ -23,6 +23,16 @@ Dependencies
 Building
 ------------
 
+## Building in Linux 
+
+Install dependencies
+
+[cmake](https://cmake.org/)
+
+Install packages with
+
+sudo apt-get install cmake
+
 Get source:
 <pre>
 git clone https://github.com/pedro-vicente/lib_netsockets.git
@@ -31,8 +41,7 @@ cmake ..
 make
 </pre>
 
-Building in Windows 
-------------
+## Building in Windows 
 <pre>
 bld.bat
 </pre>
