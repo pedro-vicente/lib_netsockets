@@ -31,15 +31,17 @@ std::string read_response(socket_t &socket)
   int recv_size; // size in bytes received or -1 on error 
   size_t size_json = 0; //in bytes
   std::string str_header;
+  std::string str;
 
-  //parse header, one character at a time and look for for separator #, assume size header lenght less than 20 digits
+  //parse header, one character at a time and look for for separator #
+  //assume size header lenght less than 20 digits
   for (size_t idx = 0; idx < 20; idx++)
   {
     char c;
     if ((recv_size = recv(socket.m_socket_fd, &c, 1, 0)) == -1)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
-      return NULL;
+      return str;
     }
     if (c == '#')
     {
@@ -59,7 +61,7 @@ std::string read_response(socket_t &socket)
   if (socket.read_all(buf, size_json) < 0)
   {
     std::cout << "recv error: " << strerror(errno) << std::endl;
-    return NULL;
+    return str;
   }
   std::string str_json(buf, size_json);
   delete[] buf;
