@@ -164,7 +164,7 @@ if (OPENSSL_INCLUDE)
 
   if(OPENSSL_INCLUDE AND OPENSSL_LIBRARY AND CRYPTO_LIBRARY)
     message("-- Building SSL TCP example")
-    add_executable(openssl_client src/openssl_socket.cc src/openssl_socket.hh examples/openssl_client.cc )
+    add_executable(openssl_client src/openssl_socket.cc src/openssl_socket.hh src/tls_socket.cc src/tls_socket.hh examples/openssl_client.cc )
     add_executable(https_coin src/openssl_socket.cc src/openssl_socket.hh examples/coin.cc examples/coin.hh examples/https_coin.cc external/gason/src/gason.cpp)
     target_include_directories(openssl_client PRIVATE ${OPENSSL_INCLUDE})
     target_include_directories(https_coin PRIVATE ${OPENSSL_INCLUDE} external/gason/src)

@@ -46,7 +46,11 @@ int main(int argc, char *argv[])
   bool verbose = true;
 
   //load currencies list from local file
-  curr.get_currencies_list("../coin_list.json");
+#if defined (_MSC_VER)
+  curr.get_currencies_list("../examples/coin_list.json");
+#else
+  curr.get_currencies_list("../examples/coin_list.json");
+#endif
 
   for (int idx = 1; idx < argc; idx++)
   {
