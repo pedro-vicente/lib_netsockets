@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include "socket.hh"
@@ -23,6 +25,9 @@ void usage()
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int handle_client(socket_t& socket);
+std::string do_plot();
+std::string do_map();
+std::string read_map();
 
 int main(int argc, char *argv[])
 {
@@ -103,24 +108,12 @@ int handle_client(socket_t& socket)
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //response
+  //response is a simple HTTP 200 OK reply followed by script
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   std::string str("HTTP/1.1 200 OK\r\n\r\n");
-  str += "<!doctype html><html>";
-  str += "<head>";
-  str += "</head>";
-  str += "<body>server<div id='div_id'></div>";
-  str += "<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>";
-  str += "<script>";
-  str += "var trace1 = {";
-  str += "x: [2, 3, 4, 5],";
-  str += "y: [16, 5, 11, 10],";
-  str += "mode: 'lines+markers'";
-  str += "};";
-  str += "var data = [trace1];";
-  str += "var layout = {};";
-  str += "Plotly.newPlot('div_id', data, layout);";
-  str += "</script></body></html>";
+  str += read_map();
+  str += do_map();
 
   if (verbose)
   {
@@ -136,4 +129,66 @@ int handle_client(socket_t& socket)
   return 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//do_plot
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::string do_plot()
+{
+  std::string str;
+  str += "<!doctype html><html>";
+  str += "<head>";
+  str += "</head>";
+  str += "<body>server<div id='div_id'></div>";
+  str += "<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>";
+  str += "<script>";
+  str += "var trace1 = {";
+  str += "x: [2, 3, 4, 5],";
+  str += "y: [16, 5, 11, 10],";
+  str += "mode: 'lines+markers'";
+  str += "};";
+  str += "var data = [trace1];";
+  str += "var layout = {};";
+  str += "Plotly.newPlot('div_id', data, layout);";
+  str += "</script></body></html>";
+  return str;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//read_map
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string read_map()
+{
+  std::ifstream ifs("index.leaflet.html");
+  std::stringstream strm;
+  strm << ifs.rdbuf();
+  return strm.str();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//do_map
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string do_map()
+{
+  std::ostringstream strm;
+  strm
+    << "<script>"
+    << "var layer_base = L.tileLayer(\n"
+    << "'http://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png',{\n"
+    << "opacity: 1\n"
+    << "});\n"
+    << "var map = new L.Map('map', {\n"
+    << "center: new L.LatLng(38.9072, -77.0369),\n"
+    << "zoom: 13,\n"
+    << "layers: [layer_base]\n"
+    << "});\n"
+    << "var circle = L.circle([38.9072, -77.0369], {"
+    << "color: '#ff0000',"
+    << "stroke: false,"
+    << "radius : 500"
+    << "}).addTo(map);"
+    << "</script>";
+  return strm.str();
+}
