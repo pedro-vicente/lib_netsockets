@@ -61,6 +61,8 @@ endif()
 set(LIBS ${LIBS})
 if (MSVC)
   set(LIBS ${LIBS} ws2_32.lib)
+else()
+  set( CMAKE_CXX_FLAGS " -pthread " )
 endif(MSVC)
 
 include_directories(src)
