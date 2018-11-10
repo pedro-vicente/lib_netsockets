@@ -9,6 +9,19 @@
 bool verbose = true;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+//wait()
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void wait(int nbr_secs)
+{
+#ifdef _MSC_VER
+  Sleep(1000 * nbr_secs);
+#else
+  sleep(nbr_secs);
+#endif
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 //usage
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,9 +38,9 @@ void usage()
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int handle_client(socket_t& socket);
-std::string do_plot();
 std::string do_map();
 std::string read_map();
+std::string do_circle(int radius);
 
 int main(int argc, char *argv[])
 {
@@ -114,6 +127,7 @@ int handle_client(socket_t& socket)
   std::string str;
   str += read_map();
   str += do_map();
+  str += do_circle(500);
 
   std::string http("HTTP/1.1 200 OK\r\n");
   http += "Content-Length: ";
@@ -190,10 +204,25 @@ std::string do_map()
     << "zoom: 13,\n"
     << "layers: [layer_base]\n"
     << "});\n"
+    << "</script>";
+  return strm.str();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//do_circle
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string do_circle(int radius)
+{
+  std::ostringstream strm;
+  strm
+    << "<script>"
     << "var circle = L.circle([38.9072, -77.0369], {"
     << "color: '#ff0000',"
     << "stroke: false,"
-    << "radius : 500"
+    << "radius : "
+    << std::to_string(radius);
+  strm
     << "}).addTo(map);"
     << "</script>";
   return strm.str();
