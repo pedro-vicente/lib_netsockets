@@ -111,16 +111,22 @@ int handle_client(socket_t& socket)
   //response is a simple HTTP 200 OK reply followed by script
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  std::string str("HTTP/1.1 200 OK\r\n\r\n");
+  std::string str;
   str += read_map();
   str += do_map();
 
+  std::string http("HTTP/1.1 200 OK\r\n");
+  http += "Content-Length: ";
+  http += std::to_string(str.size());
+  http += "\r\n\r\n";
+  http += str;
+
   if (verbose)
   {
-    std::cout << str << std::endl;
+    std::cout << http << std::endl;
   }
 
-  if (socket.write_all(str.c_str(), str.size()) < 0)
+  if (socket.write_all(http.c_str(), http.size()) < 0)
   {
     std::cout << "write response error\n";
     return -1;
