@@ -19,7 +19,7 @@ if exist %root%\external\openssl-1.1.0g\libssl.lib (
   echo building openssl-1.1.0g
   pushd external
   pushd openssl-1.1.0g
-  perl Configure VC-WIN32 no-asm no-shared --debug --prefix=%root%\ssl 
+  perl Configure VC-WIN64A no-asm no-shared --debug --prefix=%root%\ssl 
   nmake
   nmake install
   popd

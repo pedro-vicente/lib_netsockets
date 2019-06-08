@@ -41,7 +41,7 @@ class tls_socket_t
 public:
   tls_socket_t();
   ~tls_socket_t();
-  int open(const char *host);
+  int open(const char *host, const char* port);
   int send(const char *buf);
   int receive();
 protected:

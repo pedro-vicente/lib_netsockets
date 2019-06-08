@@ -64,12 +64,13 @@ tls_socket_t::~tls_socket_t()
 //tls_socket_t::open
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int tls_socket_t::open(const char *host_name)
+int tls_socket_t::open(const char* host_name, const char* port)
 {
   long res = 1;
   unsigned long ssl_err = 0;
   std::string name(host_name);
-  name += ":443";
+  name += ":";
+  name += port;
   BIO_set_conn_hostname(m_socket, name.c_str());
   ssl_err = ERR_get_error();
   BIO_get_ssl(m_socket, &m_ssl);
@@ -101,7 +102,7 @@ int tls_socket_t::open(const char *host_name)
 //tls_socket_t::send
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int tls_socket_t::send(const char *buf)
+int tls_socket_t::send(const char* buf)
 {
   std::cout << buf;
   BIO_puts(m_socket, buf);
