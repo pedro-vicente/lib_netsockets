@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {
   char buf[10];
-  sprintf(buf, "12345\r\n");
+  sprintf(buf, "12345");
   tcp_client_t client("127.0.0.1", 2000);
   //create socket and open connection
   client.open();

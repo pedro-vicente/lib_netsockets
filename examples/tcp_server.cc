@@ -18,12 +18,8 @@ int main(int argc, char* argv[])
   {
     socket_t socket = server.accept_client();
     int recv_size = socket.read_all(buf, sizeof(buf));
-    //read, strip extra charactes received (size is not known, detect end of message)
-    std::string str(buf);
-    size_t pos = str.find("\r\n");
-    std::string str_message(str.substr(0, pos + 2));
-    std::cout << "server received " << recv_size << " bytes: " << str_message;
-    //close
+    std::string str(buf, recv_size);
+    std::cout << "server received " << recv_size << " bytes: " << str;
     socket.close_socket();
   }
   server.close_socket();
