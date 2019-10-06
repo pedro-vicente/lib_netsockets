@@ -7,7 +7,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //main
-//example of a TCP client
+//example of socket I/O between 2 endpoints
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[])
@@ -16,27 +16,31 @@ int main(int argc, char *argv[])
   sprintf(buf, "12345");
   tcp_client_t client("127.0.0.1", 2000);
 
-  wait(2);
+  while (1)
+  {
 
-  //create socket and open connection
-  client.connect();
+    wait(3);
 
-  //write something
-  client.write_all(buf, strlen(buf));
-  std::cout << "client sent " << strlen(buf) << " bytes: " << buf << "\n";
+    //create socket and open connection
+    client.connect();
 
-  //close connection (server must read all)
-  client.close_socket();
+    //write something
+    client.write_all(buf, strlen(buf));
+    std::cout << "client sent " << strlen(buf) << " bytes: " << buf << "\n";
 
-  //create socket and open connection
-  client.connect();
+    //close connection (server must read all)
+    client.close_socket();
 
-  //read
-  int size = client.read_all(buf, strlen(buf));
-  std::string str(buf, size);
-  std::cout << "client received " << size << " bytes: " << str.c_str() << "\n";
+    //create socket and open connection
+    client.connect();
 
-  //close connection
-  client.close_socket();
+    //read
+    int size = client.read_all(buf, strlen(buf));
+    std::string str(buf, size);
+    std::cout << "client received " << size << " bytes: " << str.c_str() << "\n";
+
+    //close connection
+    client.close_socket();
+  }
   return 0;
 }
