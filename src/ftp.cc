@@ -294,7 +294,7 @@ void ftp_t::create_socket(int &sock, const char* server_ip, const unsigned short
   }
 
   // establish the connection to the server
-  if (connect(sock, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0)
+  if (::connect(sock, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0)
   {
     std::cout << "connect error: " << strerror(errno) << std::endl;
     exit(1);

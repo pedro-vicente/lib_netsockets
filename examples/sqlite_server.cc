@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
   while (true)
   {
-    socket_t socket = server.accept_client();
+    socket_t socket = server.accept();
 
     // convert IP addresses from a dots-and-number string to a struct in_addr
     char *str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);

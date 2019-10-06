@@ -16,10 +16,22 @@ int main(int argc, char* argv[])
   tcp_server_t server(2000);
   while (true)
   {
-    socket_t socket = server.accept_client();
-    int recv_size = socket.read_all(buf, sizeof(buf));
-    std::string str(buf, recv_size);
-    std::cout << "server received " << recv_size << " bytes: " << str;
+    socket_t socket = server.accept();
+    int size = socket.read_all(buf, sizeof(buf));
+
+    std::string str(buf, size);
+    std::cout << "server received " << size << " bytes: " << str << "\n";
+
+    //close connection (client must read all)
+    socket.close_socket();
+
+    //send a reply
+    sprintf(buf, "67");
+
+    socket = server.accept();
+    socket.write_all(buf, strlen(buf));
+    std::cout << "server sent " << strlen(buf) << " bytes: " << buf << "\n";
+
     socket.close_socket();
   }
   server.close_socket();

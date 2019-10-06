@@ -156,7 +156,7 @@ int get_coin(const std::string &coin_code, const std::string &date_end, bool ver
   std::cout << "getting coin " << coin_code << " ... ";
 
   //open connection
-  if (client.open() < 0)
+  if (client.connect() < 0)
   {
     std::cout << "cannot connect to: " << host_name << ":" << port << std::endl;
     return -1;

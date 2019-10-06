@@ -37,6 +37,8 @@
 std::string str_extract(const std::string& str_in);
 std::string prt_time();
 int set_daemon(const char* str_dir);
+void wait(int nbr_secs);
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //socket_t
@@ -71,7 +73,7 @@ class tcp_server_t : public socket_t
 {
 public:
   tcp_server_t(const unsigned short server_port);
-  socket_t accept_client();
+  socket_t accept();
   ~tcp_server_t();
 };
 
@@ -84,7 +86,7 @@ class tcp_client_t : public socket_t
 public:
   tcp_client_t(const char* host_name, const unsigned short server_port);
   ~tcp_client_t();
-  int open();
+  int connect();
 
 protected:
   std::string m_server_ip;

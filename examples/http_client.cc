@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   http_client_t client(host_name.c_str(), port);
 
   //open connection
-  if (client.open() < 0)
+  if (client.connect() < 0)
   {
 
   }

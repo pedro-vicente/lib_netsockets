@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   //create socket and open connection
   /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if (client.open() < 0)
+  if (client.connect() < 0)
   {
   }
   std::cout << "client connected to: " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;

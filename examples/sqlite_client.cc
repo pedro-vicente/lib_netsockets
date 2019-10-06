@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
   tcp_client_t client(host_name.c_str(), port);
   std::cout << "client connecting to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
 
-  if (client.open() < 0)
+  if (client.connect() < 0)
   {
     std::string  str = "connect error to: ";
     str += host_name;
