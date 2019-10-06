@@ -5,7 +5,6 @@ C++ light wrapper for POSIX and Winsock sockets using TCP. Examples include:
 * TCP client/server sending SQL as JSON to SQLite database in TCP server
 * HTTP client/server
 * FTP client
-* SSL TCP client
 
 Dependencies 
 ------------
@@ -15,10 +14,6 @@ Dependencies
 
 [SQLite](https://www.sqlite.org/) (included)
 <br />
-
-[OpenSSL](https://www.openssl.org/) ( included)
-<br />
-
 
 Building
 ------------
@@ -87,9 +82,7 @@ ftp.logout();
 ```
 
 # SQLite server/client example
-
-
-THis example provides a REST API to send SQL commands as a JSON array from a TCP client to TCP server.
+This example provides a REST API to send SQL commands as a JSON array from a TCP client to TCP server.
 The example consists of a SQLite database with 2 tables "places" (like your favorite places) and "items" (like items for each place).
 This database resides on the server. API is
 
@@ -134,8 +127,6 @@ http://127.0.0.1/get_places
 will cause the server to send all rows from table "places" to the browser as a HTTP json response
 
 # TCP JSON server/client output
-
-
 ```
 server listening on port 2001
 Wed May 16 13:53:21 2018 server accepted: 127.0.0.1 <260>
@@ -144,7 +135,6 @@ Wed May 16 13:53:21 2018 server sent: {"next_year":2018}
 ```
 
 # HTTP client usage
-
 ```
 usage: http_client -s SERVER -t 'HTTP_REQUEST' <-p PORT> <-v> <-h>
 -s SERVER: fully qualified web server name
@@ -155,7 +145,6 @@ usage: http_client -s SERVER -t 'HTTP_REQUEST' <-p PORT> <-v> <-h>
 ```
 
 # HTTP REST example request
-
 Example REST API
 
 https://jsonplaceholder.typicode.com/

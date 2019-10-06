@@ -29,7 +29,7 @@ int write_request(socket_t &socket, const char* buf_json)
 std::string read_response(socket_t &socket)
 {
   int recv_size; // size in bytes received or -1 on error 
-  size_t size_json = 0; //in bytes
+  int size_json = 0; //in bytes
   std::string str_header;
   std::string str;
 
@@ -38,7 +38,7 @@ std::string read_response(socket_t &socket)
   for (size_t idx = 0; idx < 20; idx++)
   {
     char c;
-    if ((recv_size = recv(socket.m_socket_fd, &c, 1, 0)) == -1)
+    if ((recv_size = ::recv(socket.m_socket_fd, &c, 1, 0)) == -1)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
       return str;

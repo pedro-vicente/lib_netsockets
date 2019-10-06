@@ -423,7 +423,7 @@ void ftp_t::send_all(int sock, const void *vbuf, size_t size_buf)
 {
   const char *buf = (char*)vbuf;	// can't do pointer arithmetic on void* 
   int send_size; // size in bytes sent or -1 on error 
-  size_t size_left; // size left to send 
+  int size_left; // size left to send 
   const int flags = 0;
 
   size_left = size_buf;

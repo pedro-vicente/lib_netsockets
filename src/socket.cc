@@ -48,7 +48,7 @@ std::string prt_time()
 //extract last component of file full path
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string str_extract(const std::string &str_in)
+std::string str_extract(const std::string& str_in)
 {
   size_t pos = str_in.find_last_of("/\\");
   std::string str = str_in.substr(pos + 1, str_in.size());
@@ -142,13 +142,17 @@ void socket_t::close_socket()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //socket_t::write_all
+//::send
+//http://man7.org/linux/man-pages/man2/send.2.html
+//The system calls send(), sendto(), and sendmsg() are used to transmit
+//a message to another socket.
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int socket_t::write_all(const void *_buf, int size_buf)
+int socket_t::write_all(const void* _buf, int size_buf)
 {
-  const char *buf = static_cast<const char *>(_buf); // can't do pointer arithmetic on void* 
+  const char* buf = static_cast<const char*>(_buf); // can't do pointer arithmetic on void* 
   int sent_size; // size in bytes sent or -1 on error 
-  size_t size_left; // size in bytes left to send 
+  int size_left; // size in bytes left to send 
   const int flags = 0;
 
   size_left = size_buf;
@@ -158,7 +162,7 @@ int socket_t::write_all(const void *_buf, int size_buf)
     //write the data, being careful of interrupted system calls and partial results
     do
     {
-      sent_size = send(m_socket_fd, buf, size_left, flags);
+      sent_size = ::send(m_socket_fd, buf, size_left, flags);
     } while (-1 == sent_size && EINTR == errno);
 
     if (-1 == sent_size)
@@ -178,13 +182,16 @@ int socket_t::write_all(const void *_buf, int size_buf)
 //socket_t::read_all
 //read SIZE_BUF bytes of data from M_SOCKET_FD into buffer BUF 
 //return total size read
+//http://man7.org/linux/man-pages/man2/recv.2.html
+//The recv(), recvfrom(), and recvmsg() calls are used to receive
+//messages from a socket.
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int socket_t::read_all(void *_buf, int size_buf)
+int socket_t::read_all(void* _buf, int size_buf)
 {
-  char *buf = static_cast<char *>(_buf); // can't do pointer arithmetic on void* 
+  char* buf = static_cast<char*>(_buf); // can't do pointer arithmetic on void* 
   int recv_size; // size in bytes received or -1 on error 
-  size_t size_left; // size in bytes left to send 
+  int size_left; // size in bytes left to send 
   const int flags = 0;
   int total_recv_size = 0;
 
@@ -195,7 +202,7 @@ int socket_t::read_all(void *_buf, int size_buf)
     //read the data, being careful of interrupted system calls and partial results
     do
     {
-      recv_size = recv(m_socket_fd, buf, size_left, flags);
+      recv_size = ::recv(m_socket_fd, buf, size_left, flags);
     } while (-1 == recv_size && EINTR == errno);
 
     if (-1 == recv_size)
@@ -227,14 +234,14 @@ int socket_t::read_all(void *_buf, int size_buf)
 //usage in HTTP
 ///////////////////////////////////////////////////////////////////////////////////////
 
-int socket_t::read_all_get_close(const char *file_name, bool verbose)
+int socket_t::read_all_get_close(const char* file_name, bool verbose)
 {
   int recv_size; // size in bytes received or -1 on error 
   int total_recv_size = 0;
   const int flags = 0;
   const int size_buf = 4096;
   char buf[size_buf];
-  FILE *file;
+  FILE* file;
 
   file = fopen(file_name, "wb");
   while (1)
@@ -278,10 +285,10 @@ int socket_t::read_all_get_close(const char *file_name, bool verbose)
 //The getaddrinfo function provides protocol-independent translation from an ANSI host name to an address
 ///////////////////////////////////////////////////////////////////////////////////////
 
-int socket_t::hostname_to_ip(const char *host_name, char *ip)
+int socket_t::hostname_to_ip(const char* host_name, char* ip)
 {
-  struct addrinfo hints, *servinfo, *p;
-  struct sockaddr_in *h;
+  struct addrinfo hints, * servinfo, * p;
+  struct sockaddr_in* h;
   int rv;
 
   memset(&hints, 0, sizeof hints);
@@ -296,7 +303,7 @@ int socket_t::hostname_to_ip(const char *host_name, char *ip)
 
   for (p = servinfo; p != NULL; p = p->ai_next)
   {
-    h = (struct sockaddr_in *) p->ai_addr;
+    h = (struct sockaddr_in*) p->ai_addr;
     strcpy(ip, inet_ntoa(h->sin_addr));
   }
 
@@ -321,7 +328,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   sockaddr_in server_addr; // local address
 
   // create TCP socket for incoming connections
-  if ((m_socket_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  if ((m_socket_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
     std::cout << "socket error: " << std::endl;
     exit(1);
@@ -334,7 +341,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   server_addr.sin_port = htons(server_port);        // local port
 
   // bind to the local address
-  if (::bind(m_socket_fd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0)
+  if (::bind(m_socket_fd, (sockaddr*)& server_addr, sizeof(server_addr)) < 0)
   {
     //bind error: Permission denied
     //probably trying to bind a port under 1024. These ports usually require root privileges to be bound.
@@ -368,24 +375,25 @@ tcp_server_t::~tcp_server_t()
 
 socket_t tcp_server_t::accept_client()
 {
-  int socket_client_fd; // socket descriptor for client
   sockaddr_in addr_client; // client address
 #if defined (_MSC_VER)
   int len_addr; // length of client address data structure
+  SOCKET fd; // socket descriptor for client
 #else
   socklen_t len_addr;
+  int fd;
 #endif
 
   // set length of client address structure (in-out parameter)
   len_addr = sizeof(addr_client);
 
   // wait for a client to connect
-  if ((socket_client_fd = accept(m_socket_fd, (struct sockaddr *) &addr_client, &len_addr)) < 0)
+  if ((fd = ::accept(m_socket_fd, (struct sockaddr*) & addr_client, &len_addr)) < 0)
   {
     std::cout << "accept error " << std::endl;
   }
 
-  socket_t socket(socket_client_fd, addr_client);
+  socket_t socket(fd, addr_client);
   return socket;
 }
 
@@ -393,7 +401,7 @@ socket_t tcp_server_t::accept_client()
 //tcp_client_t::tcp_client_t
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-tcp_client_t::tcp_client_t(const char *host_name, const unsigned short server_port)
+tcp_client_t::tcp_client_t(const char* host_name, const unsigned short server_port)
   : socket_t(),
   m_server_port(server_port)
 {
@@ -423,7 +431,7 @@ int tcp_client_t::open()
   struct sockaddr_in server_addr; // server address
 
   // create a stream socket using TCP
-  if ((m_socket_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  if ((m_socket_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
     std::cout << "socket error: " << std::endl;
     return -1;
@@ -440,7 +448,7 @@ int tcp_client_t::open()
   server_addr.sin_port = htons(m_server_port); // server port
 
   // establish the connection to the server
-  if (connect(m_socket_fd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0)
+  if (::connect(m_socket_fd, (struct sockaddr*) & server_addr, sizeof(server_addr)) < 0)
   {
     std::cout << "connect error: " << strerror(errno) << std::endl;
     return -1;
@@ -466,13 +474,13 @@ tcp_client_t::~tcp_client_t()
 //function shall still return this data.
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int socket_t::parse_http_headers(std::string &http_headers)
+int socket_t::parse_http_headers(std::string& http_headers)
 {
   int recv_size; // size in bytes received or -1 on error 
   const int size_buf = 4096;
   char buf[size_buf];
 
-  if ((recv_size = recv(m_socket_fd, buf, size_buf, MSG_PEEK)) == -1)
+  if ((recv_size = ::recv(m_socket_fd, buf, size_buf, MSG_PEEK)) == -1)
   {
     std::cout << "recv error: " << strerror(errno) << std::endl;
     return -1;
@@ -493,7 +501,7 @@ int socket_t::parse_http_headers(std::string &http_headers)
   std::cout << str_headers.c_str() << std::endl;
 
   //now get headers with the obtained size from socket
-  if ((recv_size = recv(m_socket_fd, buf, header_len, 0)) == -1)
+  if ((recv_size = ::recv(m_socket_fd, buf, header_len, 0)) == -1)
   {
     std::cout << "recv error: " << strerror(errno) << std::endl;
     return -1;
@@ -587,7 +595,7 @@ std::string http_get_method(const std::string& str_header)
 //(as a result of this ambiguity) has to be escaped to "%2B".
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string escape_space(const std::string &str)
+std::string escape_space(const std::string& str)
 {
   std::string str_out;
   size_t pos = str.find(' ');
