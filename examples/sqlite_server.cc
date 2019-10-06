@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "socket.hh"
+#include "http.hh"
 #include "sqlite3.h"
 #include "gason.h"
 #include "sql_message.hh"
@@ -107,7 +108,7 @@ int handle_client(socket_t& socket, const std::string& db_path)
   std::string json; //response
   char buf[4096];
 
-  if (socket.parse_http_headers(header) < 0)
+  if (parse_http_headers(socket.m_socket_fd, header) < 0)
   {
     std::cout << "parse_http_headers error\n";
     return -1;

@@ -24,6 +24,7 @@ void usage()
 ///////////////////////////////////////////////////////////////////////////////////////
 //main
 //HTTP client 
+//-s 127.0.0.1 -p 3000
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[])
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
     usage();
   }
 
-  http_t client(host_name.c_str(), port);
+  http_client_t client(host_name.c_str(), port);
 
   //open connection
   if (client.open() < 0)
@@ -120,48 +121,4 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//mapzen_request
-///////////////////////////////////////////////////////////////////////////////////////
 
-std::string mapzen_request()
-{
-  const char *host_name = "search.mapzen.com";
-  std::string header;
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //request
-  //"http://search.mapzen.com/v1/search?api_key=mapzen-hdJZGhf&text=YMCA"
-  //By specifying a focus.point, nearby places will be scored higher depending on how close they are 
-  //to the focus.point so that places with higher scores will appear higher in the results list. 
-  //The effect of this scoring boost diminishes to zero after 100 kilometers away from the focus.point
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  std::string str_search = "Ella's Wood-fired Pizza";
-  std::string str_lat = "38.9072";
-  std::string str_lon = "-77.0369";
-  str_search = escape_space(str_search);
-
-  header += "GET /v1/search?api_key=mapzen-hdJZGhf&text=";
-  header += str_search;
-  header += "&size=2";
-  header += "&layers=venue";
-  header += "&boundary.circle.lat=";
-  header += str_lat;
-  header += "&boundary.circle.lon=";
-  header += str_lon;
-  header += "&boundary.circle.radius=30";
-  header += "&focus.point.lat=";
-  header += str_lat;
-  header += "&focus.point.lon=";
-  header += str_lon;
-  header += " HTTP/1.1\r\n";
-  header += "Host: ";
-  header += host_name;
-  header += "\r\n";
-  header += "Accept: application/json\r\n";
-  header += "Connection: close";
-  header += "\r\n";
-  header += "\r\n";
-  return header;
-}

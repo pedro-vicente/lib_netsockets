@@ -151,7 +151,7 @@ std::string get_header(const std::string &api_call)
 
 int get_coin(const std::string &coin_code, const std::string &date_end, bool verbose)
 {
-  http_t client(host_name, port);
+  http_client_t client(host_name, port);
 
   std::cout << "getting coin " << coin_code << " ... ";
 

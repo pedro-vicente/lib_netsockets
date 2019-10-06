@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "socket.hh"
+#include "http.hh"
 
 bool verbose = true;
 
@@ -42,7 +43,7 @@ std::string do_map();
 std::string read_map();
 std::string do_circle(int radius);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   unsigned short port = 3000;
 
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
     socket_t socket = server.accept_client();
 
     // convert IP addresses from a dots-and-number string to a struct in_addr
-    char *str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
+    char* str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
     std::cout << prt_time() << "server accepted: " << str_ip << "," << socket.m_socket_fd << std::endl;
 
     if (handle_client(socket) < 0)
@@ -92,7 +93,7 @@ int handle_client(socket_t& socket)
   std::string str_header;
   char buf[4096];
 
-  if (socket.parse_http_headers(str_header) < 0)
+  if (parse_http_headers(socket.m_socket_fd, str_header) < 0)
   {
     std::cout << "parse_http_headers error\n";
     return -1;
