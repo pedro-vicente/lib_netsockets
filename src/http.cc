@@ -22,7 +22,7 @@ http_client_t::http_client_t(const char *host_name, const unsigned short server_
 //http_client_t::get
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int http_client_t::get(const char *path_remote_file, bool verbose)
+int http_client_t::get(const char *path_remote_file)
 {
   char buf_request[1024];
 
@@ -64,7 +64,9 @@ int http_client_t::get(const char *path_remote_file, bool verbose)
     std::string str_file_name = str_extract(path_remote_file);
     //we sent a close() server request, so we can use the read_all function
     //that checks for recv() return value of zero (connection closed)
-    this->read_all_get_close(str_file_name.c_str(), verbose);
+
+    char buf_[4096];
+    this->read_all(buf_, sizeof(buf_));
   }
   return 0;
 }

@@ -2,7 +2,8 @@
 #define LIB_SOCKET_H
 
 #if defined (_MSC_VER)
-#include <winsock.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
@@ -10,17 +11,29 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h> //hostent
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
 #endif
+#include <iostream>
+#include <cerrno>
 #include <string>
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+#include <stdio.h>
+#include <assert.h>
+#include <time.h>
+#include <ctime>
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //utils
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-unsigned long long http_get_field(const std::string& str_field, const std::string& str_header);
-std::string http_get_body(const std::string& str_header);
-std::string http_get_method(const std::string& str_header);
-std::string escape_space(const std::string& str);
 std::string str_extract(const std::string& str_in);
 std::string prt_time();
 int set_daemon(const char* str_dir);
@@ -38,7 +51,6 @@ public:
   void close_socket();
   int write_all(const void* buf, int size_buf);
   int read_all(void* buf, int size_buf);
-  int read_all_get_close(const char* file_name, bool verbose);
   int hostname_to_ip(const char* host_name, char* ip);
 
 public:

@@ -17,7 +17,7 @@ class http_client_t : public tcp_client_t
 {
 public:
   http_client_t(const char *host_name, const unsigned short server_port);
-  int get(const char *path_remote_file, bool verbose);
+  int get(const char *path_remote_file);
   int post(const std::string& str_body);
 };
 

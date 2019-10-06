@@ -103,16 +103,16 @@ int main(int argc, char *argv[])
 
   //we sent a close() server request, so we can use the read_all function
   //that checks for recv() return value of zero (connection closed)
-  if (client.read_all_get_close("response.txt", verbose) < 0)
+  char buf_[4096];
+  int size_read;
+  if ((size_read = client.read_all(buf_, sizeof(buf_))) < 0)
   {
     return -1;
   }
 
-  std::ifstream ifs("response.txt", std::ios::binary);
-  std::stringstream buf;
-  buf << ifs.rdbuf();
-  std::cout << buf.str();
-  std::string str_body = http_get_body(buf.str());
+  std::string buf(buf_, size_read);
+  std::cout << buf.c_str();
+  std::string str_body = http_get_body(buf.c_str());
   std::ofstream ofs("response.json", std::ios::out | std::ios::binary);
   ofs.write(str_body.c_str(), str_body.size());
   ofs.close();

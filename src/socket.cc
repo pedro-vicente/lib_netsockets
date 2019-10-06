@@ -1,30 +1,3 @@
-#if defined (_MSC_VER)
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h> //hostent
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <syslog.h>
-#endif
-#include <iostream>
-#include <cerrno>
-#include <string>
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <stdio.h>
-#include <assert.h>
-#include <time.h>
-#include <ctime>
 #include "socket.hh"
 
 const int MAXPENDING = 5; // maximum outstanding connection requests
@@ -196,7 +169,6 @@ int socket_t::read_all(void* _buf, int size_buf)
   int total_recv_size = 0;
 
   size_left = size_buf;
-
   while (size_left > 0)
   {
     //read the data, being careful of interrupted system calls and partial results
@@ -204,85 +176,26 @@ int socket_t::read_all(void* _buf, int size_buf)
     {
       recv_size = ::recv(m_socket_fd, buf, size_left, flags);
     } while (-1 == recv_size && EINTR == errno);
-
     if (-1 == recv_size)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
     }
-
     //everything received, exit
     if (0 == recv_size)
     {
       break;
     }
-
     size_left -= recv_size;
     buf += recv_size;
     total_recv_size += recv_size;
   }
-
-  return total_recv_size;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-//socket_t::read_all_get_close
-//http://man7.org/linux/man-pages/man2/recv.2.html
-//recv() 'size_buf' bytes and save to local FILE
-//assumptions: 
-//total size to receive is not known
-//other end did a close() connection, so it is possible to check a zero return value of recv()
-//usage in HTTP
-///////////////////////////////////////////////////////////////////////////////////////
-
-int socket_t::read_all_get_close(const char* file_name, bool verbose)
-{
-  int recv_size; // size in bytes received or -1 on error 
-  int total_recv_size = 0;
-  const int flags = 0;
-  const int size_buf = 4096;
-  char buf[size_buf];
-  FILE* file;
-
-  file = fopen(file_name, "wb");
-  while (1)
-  {
-    //read the data, being careful of interrupted system calls and partial results
-    do
-    {
-      recv_size = recv(m_socket_fd, buf, size_buf, flags);
-    } while (-1 == recv_size && EINTR == errno);
-
-    if (-1 == recv_size)
-    {
-      std::cout << "\nrecv error: " << strerror(errno) << std::endl;
-      return 0;
-    }
-
-    total_recv_size += recv_size;
-
-    if (recv_size == 0)
-    {
-      if (verbose) std::cout << "all bytes received " << std::endl;
-      break;
-    }
-
-    if (verbose)
-    {
-      for (int i = 0; i < recv_size; i++)
-      {
-        std::cout << buf[i];
-      }
-    }
-
-    fwrite(buf, recv_size, 1, file);
-  }
-  fclose(file);
   return total_recv_size;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //socket_t::hostname_to_ip
-//The getaddrinfo function provides protocol-independent translation from an ANSI host name to an address
+//The getaddrinfo function provides protocol-independent translation from an ANSI host name 
+//to an address
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int socket_t::hostname_to_ip(const char* host_name, char* ip)
