@@ -39,11 +39,10 @@ int main(int argc, char *argv[])
   std::cout << "server listening on port " << port << std::endl;
   while (true)
   {
-    char *str_ip;
     socket_t socket = server.accept();
 
     // convert IP addresses from a dots-and-number string to a struct in_addr and back
-    str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
+    char* str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
     std::cout << prt_time() << "server accepted: " << str_ip << " <" << socket.m_socket_fd << "> " << std::endl;
 
     std::string str_request = read_response(socket);

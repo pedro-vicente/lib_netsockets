@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (host_name.empty() || host_name.empty())
+  if (host_name.empty())
   {
     usage();
   }
