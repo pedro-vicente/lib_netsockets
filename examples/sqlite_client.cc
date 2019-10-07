@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
 #endif
 
   tcp_client_t client(host_name.c_str(), port);
-  std::cout << "client connecting to: " << host_name << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+  std::cout << "client connecting to: " << host_name << ":" << port << " <" << client.m_sockfd << "> " << std::endl;
 
   if (client.connect() < 0)
   {
@@ -281,7 +281,7 @@ int get_response(socket_t& socket, std::string& response)
 {
   //get HTTP header
   std::string header;
-  if (parse_http_headers(socket.m_socket_fd, header) == 0)
+  if (parse_http_headers(socket.m_sockfd, header) == 0)
   {
     return 0;
   }

@@ -29,6 +29,12 @@
 #include <time.h>
 #include <ctime>
 
+//multi platform socket descriptor
+#if _WIN32
+typedef SOCKET socketfd_t;
+#else
+typedef int socketfd_t;
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //utils
@@ -48,8 +54,7 @@ class socket_t
 {
 public:
   socket_t();
-  socket_t(int socket_fd, sockaddr_in sock_addr);
-  ~socket_t();
+  socket_t(socketfd_t sockfd, sockaddr_in sock_addr);
   void close();
   int write_all(const void* buf, int size_buf);
   int read_all(void* buf, int size_buf);
@@ -57,11 +62,7 @@ public:
 
 public:
   // socket descriptor 
-#if defined (_MSC_VER)
-  SOCKET m_socket_fd;
-#else
-  int m_socket_fd;
-#endif
+  socketfd_t m_sockfd;
   sockaddr_in m_sockaddr_in; // client address (used to store return value of server accept())
 };
 

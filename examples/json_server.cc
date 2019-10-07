@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
     // convert IP addresses from a dots-and-number string to a struct in_addr and back
     char* str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
-    std::cout << prt_time() << "server accepted: " << str_ip << " <" << socket.m_socket_fd << "> " << std::endl;
+    std::cout << prt_time() << "server accepted: " << str_ip << " <" << socket.m_sockfd << "> " << std::endl;
 
     std::string str_request = read_response(socket);
     std::cout << prt_time() << "server received: " << str_request << std::endl;

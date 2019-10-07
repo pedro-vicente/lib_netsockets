@@ -41,7 +41,6 @@ std::string str_extract(const std::string& str_in)
   return str;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////
 //set_daemon
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,8 @@ int set_daemon(const char* str_dir)
 //socket_t::socket_t()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-socket_t::socket_t() : m_socket_fd(-1)
+socket_t::socket_t() :
+  m_sockfd(-1)
 {
   memset(&m_sockaddr_in, 0, sizeof(m_sockaddr_in));
 }
@@ -99,17 +99,9 @@ socket_t::socket_t() : m_socket_fd(-1)
 //socket_t::socket_t()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-socket_t::socket_t(int socket_fd, sockaddr_in sock_addr) :
-  m_socket_fd(socket_fd),
+socket_t::socket_t(socketfd_t sockfd, sockaddr_in sock_addr) :
+  m_sockfd(sockfd),
   m_sockaddr_in(sock_addr)
-{
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//socket_t::~socket_t()
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-socket_t::~socket_t()
 {
 }
 
@@ -120,9 +112,9 @@ socket_t::~socket_t()
 void socket_t::close()
 {
 #if defined (_MSC_VER)
-  ::closesocket(m_socket_fd);
+  ::closesocket(m_sockfd);
 #else
-  ::close(m_socket_fd);
+  ::close(m_sockfd);
 #endif
 }
 
@@ -148,7 +140,7 @@ int socket_t::write_all(const void* _buf, int size_buf)
     //write the data, being careful of interrupted system calls and partial results
     do
     {
-      sent_size = ::send(m_socket_fd, buf, size_left, flags);
+      sent_size = ::send(m_sockfd, buf, size_left, flags);
     } while (-1 == sent_size && EINTR == errno);
 
     if (-1 == sent_size)
@@ -166,7 +158,7 @@ int socket_t::write_all(const void* _buf, int size_buf)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //socket_t::read_all
-//read SIZE_BUF bytes of data from M_SOCKET_FD into buffer BUF 
+//read SIZE_BUF bytes of data from m_sockfd into buffer BUF 
 //return total size read
 //http://man7.org/linux/man-pages/man2/recv.2.html
 //The recv(), recvfrom(), and recvmsg() calls are used to receive
@@ -187,7 +179,7 @@ int socket_t::read_all(void* _buf, int size_buf)
     //read the data, being careful of interrupted system calls and partial results
     do
     {
-      recv_size = ::recv(m_socket_fd, buf, size_left, flags);
+      recv_size = ::recv(m_sockfd, buf, size_left, flags);
     } while (-1 == recv_size && EINTR == errno);
     if (-1 == recv_size)
     {
@@ -254,7 +246,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   sockaddr_in server_addr; // local address
 
   // create TCP socket for incoming connections
-  if ((m_socket_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  if ((m_sockfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
     std::cout << "socket error: " << std::endl;
     exit(1);
@@ -267,7 +259,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   server_addr.sin_port = htons(server_port);        // local port
 
   // bind to the local address
-  if (::bind(m_socket_fd, (sockaddr*)& server_addr, sizeof(server_addr)) < 0)
+  if (::bind(m_sockfd, (sockaddr*)& server_addr, sizeof(server_addr)) < 0)
   {
     //bind error: Permission denied
     //probably trying to bind a port under 1024. These ports usually require root privileges to be bound.
@@ -276,7 +268,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   }
 
   // mark the socket so it will listen for incoming connections
-  if (::listen(m_socket_fd, MAXPENDING) < 0)
+  if (::listen(m_sockfd, MAXPENDING) < 0)
   {
     std::cout << "listen error: " << std::endl;
     exit(1);
@@ -315,7 +307,7 @@ socket_t tcp_server_t::accept()
   len_addr = sizeof(addr_client);
 
   // wait for a client to connect
-  if ((fd = ::accept(m_socket_fd, (struct sockaddr*) & addr_client, &len_addr)) < 0)
+  if ((fd = ::accept(m_sockfd, (struct sockaddr*) & addr_client, &len_addr)) < 0)
   {
     std::cout << "accept error " << std::endl;
   }
@@ -359,7 +351,7 @@ int tcp_client_t::connect()
   struct sockaddr_in server_addr; // server address
 
   // create a stream socket using TCP
-  if ((m_socket_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  if ((m_sockfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
     std::cout << "socket error: " << std::endl;
     return -1;
@@ -376,7 +368,7 @@ int tcp_client_t::connect()
   server_addr.sin_port = htons(m_server_port); // server port
 
   // establish the connection to the server
-  if (::connect(m_socket_fd, (struct sockaddr*) & server_addr, sizeof(server_addr)) < 0)
+  if (::connect(m_sockfd, (struct sockaddr*) & server_addr, sizeof(server_addr)) < 0)
   {
     std::cout << "connect error: " << strerror(errno) << std::endl;
     return -1;

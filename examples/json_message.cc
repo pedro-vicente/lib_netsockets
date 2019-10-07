@@ -38,7 +38,7 @@ std::string read_response(socket_t &socket)
   for (size_t idx = 0; idx < 20; idx++)
   {
     char c;
-    if ((recv_size = ::recv(socket.m_socket_fd, &c, 1, 0)) == -1)
+    if ((recv_size = ::recv(socket.m_sockfd, &c, 1, 0)) == -1)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
       return str;

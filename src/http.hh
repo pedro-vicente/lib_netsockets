@@ -3,7 +3,7 @@
 #include <string>
 #include "socket.hh"
 
-int parse_http_headers(int fd, std::string& header);
+int parse_http_headers(socketfd_t fd, std::string& header);
 unsigned long long http_get_field(const std::string& str_field, const std::string& str_header);
 std::string http_get_body(const std::string& str_header);
 std::string http_get_method(const std::string& str_header);

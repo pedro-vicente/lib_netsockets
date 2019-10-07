@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     nbr_recv++;
 
     char* str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
-    std::cout << prt_time() << "," << str_ip << "," << socket.m_socket_fd << "\n";
+    std::cout << prt_time() << "," << str_ip << "," << socket.m_sockfd << "\n";
 
     int size = socket.read_all(buf, sizeof(buf));
     size_recv += size;

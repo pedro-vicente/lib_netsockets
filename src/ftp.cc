@@ -289,7 +289,7 @@ void ftp_t::create_socket(int &sock, const char* server_ip, const unsigned short
   server_addr.sin_port = htons(server_port);// server port
 
   // create a stream socket using TCP
-  if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  if ((sock = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
   }
 

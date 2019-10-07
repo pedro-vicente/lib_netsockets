@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   //make JSON
   char buf_json[257] = "{\"start_year\":2017}";
   tcp_client_t client(server, port);
-  std::cout << "client connecting to: " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+  std::cout << "client connecting to: " << server << ":" << port << " <" << client.m_sockfd << "> " << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //create socket and open connection
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   if (client.connect() < 0)
   {
   }
-  std::cout << "client connected to: " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+  std::cout << "client connected to: " << server << ":" << port << " <" << client.m_sockfd << "> " << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //write request
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   {
   }
   std::cout << "client sent: ";
-  std::cout << buf_json << " " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+  std::cout << buf_json << " " << server << ":" << port << " <" << client.m_sockfd << "> " << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //read response
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
   std::string str_response = read_response(client);
   std::cout << "client received: ";
-  std::cout << str_response << " " << server << ":" << port << " <" << client.m_socket_fd << "> " << std::endl;
+  std::cout << str_response << " " << server << ":" << port << " <" << client.m_sockfd << "> " << std::endl;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //close connection

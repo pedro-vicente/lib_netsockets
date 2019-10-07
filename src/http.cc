@@ -39,7 +39,7 @@ int http_client_t::get(const char *path_remote_file)
 
   //parse headers
   std::string http_headers;
-  if (parse_http_headers(this->m_socket_fd, http_headers) < 0)
+  if (parse_http_headers(m_sockfd, http_headers) < 0)
   {
     return -1;
   }
@@ -98,7 +98,7 @@ int http_client_t::post(const std::string& str_body)
 //1 something received
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int parse_http_headers(int fd, std::string& header)
+int parse_http_headers(socketfd_t fd, std::string& header)
 {
   int recv_size; // size in bytes received or -1 on error 
   const int size_buf = 4096;
