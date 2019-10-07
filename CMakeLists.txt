@@ -1,58 +1,15 @@
 #CMake build, Pedro Vicente 
 #command line options for library dependencies
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project (lib_netsockets)
 include(CheckCXXCompilerFlag)
 set(BUILD_SHARED_LIBRARIES OFF)
-
-#//////////////////////////
-# colorized output
-# red, fatal error, cannot build (missing netCDF, HDF5, CURL libraries)
-# magenta, "negative" warning (missing optional libraries, GSL, ANTLR, UDUNITS)
-# green, "positive" warning (opposite of magenta, optional libraries found)
-# blue, general information to take notice (SZIP/ZLIB were detected as needed, special NCO functions are defined)
-#//////////////////////////
-
-if(NOT WIN32)
-  string(ASCII 27 Esc)
-  set(color_reset   "${Esc}[m")
-  set(color_magenta "${Esc}[35m")
-  set(color_red     "${Esc}[31m")
-  set(color_green   "${Esc}[32m")
-  set(color_blue    "${Esc}[34m")
-endif()
-
-#///////////////////////////////////////////////////////
-#MSVC
-#///////////////////////////////////////////////////////
+set (CMAKE_CXX_STANDARD 11)
 
 if (MSVC)
   add_definitions( "/D_CRT_SECURE_NO_WARNINGS /D_WINSOCK_DEPRECATED_NO_WARNINGS" )
-  if (STATIC_CRT)
-    message("-- Building with static runtime library")
-    set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /Zi /Ob0 /Od /RTC1")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL     "/MT /O1 /Ob1 /D NDEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE        "/MT /O2 /Ob2 /D NDEBUG")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT /Zi /O2 /Ob1 /D NDEBUG")
-  endif()  
 endif(MSVC)
-
-if (CMAKE_VERSION VERSION_LESS "3.1")
- if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-   CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-   if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-   elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-   else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-   endif()
- endif()
-else ()
-  set (CMAKE_CXX_STANDARD 11)
-endif()
 
 set(LIBS ${LIBS})
 if (MSVC)
@@ -72,26 +29,23 @@ set(sources ${sources} src/ftp.hh)
 set(sources ${sources} src/ftp.cc)
 
 add_library(lib_netsockets ${sources})
-add_executable(tcp_client examples/tcp_client.cc)
-add_executable(tcp_server examples/tcp_server.cc)
+add_executable(block_client examples/block_client.cc)
+add_executable(block_server examples/block_server.cc)
 add_executable(http_client examples/http_client.cc)
 add_executable(http_server examples/http_server.cc)
 add_executable(ftp_client examples/ftp_client.cc)
 add_executable(json_client examples/json_client.cc examples/json_message.hh examples/json_message.cc external/gason/src/gason.cpp)
 add_executable(json_server examples/json_server.cc examples/json_message.hh examples/json_message.cc external/gason/src/gason.cpp)
 target_include_directories(json_server PRIVATE external/gason/src)
-add_executable(http_coin examples/http_coin.cc examples/coin.cc examples/coin.hh examples/json_message.cc external/gason/src/gason.cpp)
-target_include_directories(http_coin PRIVATE external/gason/src)
 
 set(lib_netsockets lib_netsockets)
-target_link_libraries (tcp_client ${lib_netsockets} ${LIBS})
-target_link_libraries (tcp_server ${lib_netsockets} ${LIBS})
+target_link_libraries (block_client ${lib_netsockets} ${LIBS})
+target_link_libraries (block_server ${lib_netsockets} ${LIBS})
 target_link_libraries (http_client ${lib_netsockets} ${LIBS})
 target_link_libraries (http_server ${lib_netsockets} ${LIBS})
 target_link_libraries (ftp_client ${lib_netsockets} ${LIBS})
 target_link_libraries (json_client ${lib_netsockets} ${LIBS})
 target_link_libraries (json_server ${lib_netsockets} ${LIBS})
-target_link_libraries (http_coin ${lib_netsockets} ${LIBS})
 
 #///////////////////////////////////////////////////////
 #SQLite server/client example (uses JSON, SQLite)
