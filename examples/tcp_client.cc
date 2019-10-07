@@ -14,6 +14,7 @@ void usage()
 ///////////////////////////////////////////////////////////////////////////////////////
 //main
 //example of socket I/O between 2 endpoints
+//-s 127.0.0.1 -n 3
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[])
@@ -49,7 +50,7 @@ int main(int argc, char* argv[])
   sprintf(buf_s, "1234567890");
   for (int idx = 0; idx < nbr_itr; idx++)
   {
-    wait(3);
+    wait(2);
 
     //create socket and open connection
     client.connect();
