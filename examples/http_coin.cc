@@ -226,7 +226,7 @@ int get_coin(const std::string &coin_code, const std::string &date_end, bool ver
     return -1;
   }
 
-  client.close_socket();
+  client.close();
 
   std::string buf(buf_, size_read);
   std::cout << buf.c_str();

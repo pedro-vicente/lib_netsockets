@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     ofs.close();
 
     //close connection (client must read all)
-    socket.close_socket();
+    socket.close();
 
     //send a reply
     sprintf(buf, "67");
@@ -56,9 +56,9 @@ int main(int argc, char* argv[])
     socket.write_all(buf, strlen(buf));
     std::cout << "server sent " << strlen(buf) << " bytes: " << buf << "\n";
 
-    socket.close_socket();
+    socket.close();
   }
-  server.close_socket();
+  server.close();
 
   return 0;
 }

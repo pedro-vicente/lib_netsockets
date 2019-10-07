@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
     {
 
     }
-    socket.close_socket();
+    socket.close();
   }
-  server.close_socket();
+  server.close();
   return 0;
 }
 

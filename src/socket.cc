@@ -114,15 +114,15 @@ socket_t::~socket_t()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//socket_t::close_socket()
+//socket_t::close()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void socket_t::close_socket()
+void socket_t::close()
 {
 #if defined (_MSC_VER)
-  closesocket(m_socket_fd);
+  ::closesocket(m_socket_fd);
 #else
-  close(m_socket_fd);
+  ::close(m_socket_fd);
 #endif
 }
 

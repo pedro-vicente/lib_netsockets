@@ -370,9 +370,9 @@ void ftp_t::parse_PASV_response(const std::string &str_rsp, std::string &str_ser
 void ftp_t::close_socket(int sock)
 {
 #if defined (_MSC_VER)
-  closesocket(sock);
+  ::closesocket(sock);
 #else
-  close(sock);
+  ::close(sock);
 #endif
 }
 

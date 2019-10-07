@@ -76,10 +76,10 @@ int main(int argc, char *argv[])
     }
 
     std::cout << prt_time() << "server sent: " << json.c_str() << std::endl;
-    socket.close_socket();
+    socket.close();
     free(buf_request);
   }
-  server.close_socket();
+  server.close();
   return 0;
 }
 

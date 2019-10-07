@@ -50,7 +50,7 @@ public:
   socket_t();
   socket_t(int socket_fd, sockaddr_in sock_addr);
   ~socket_t();
-  void close_socket();
+  void close();
   int write_all(const void* buf, int size_buf);
   int read_all(void* buf, int size_buf);
   int hostname_to_ip(const char* host_name, char* ip);

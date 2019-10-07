@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   ofs.write(str_body.c_str(), str_body.size());
   ofs.close();
 
-  client.close_socket();
+  client.close();
   return 0;
 }
 
