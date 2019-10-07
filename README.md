@@ -26,7 +26,9 @@ Install dependencies
 
 Install packages with
 
+```
 sudo apt-get install cmake
+```
 
 Get source:
 <pre>
@@ -46,11 +48,12 @@ lib_netsockets is C++ light wrapper for POSIX and Winsock sockets with implement
 
 # TCP server example
 ```c++
+char buf[255];
 tcp_server_t server(2000);
 while (true)
 {
- socket_t socket = server.accept_client();
- handle_client(socket);
+ socket_t socket = server.accept();
+ int size = socket.read_all(buf, sizeof(buf));
  socket.close();
 }
 server.close();
@@ -58,17 +61,18 @@ server.close();
 
 # TCP client example
 ```c++
+char buf[20];
+sprintf(buf, "1234");
 tcp_client_t client("127.0.0.1", 2000);
-client.open();
-client.write(buf, strlen(buf));
-client.read_some(buf, sizeof(buf));
+client.connect();
+client.write_all(buf, strlen(buf));
 client.close();
 ```
 
 # HTTP client example
 ```c++
 http_t client("www.mysite.com", 80);
-client.get("/my/path/to/file", true);
+client.get("/my/path/to/file");
 ```
 
 # FTP client example
