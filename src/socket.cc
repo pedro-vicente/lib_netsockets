@@ -115,6 +115,9 @@ void socket_t::close()
 #else
   ::close(m_sockfd);
 #endif
+  //clear members
+  memset(&m_sockaddr_in, 0, sizeof(m_sockaddr_in));
+  m_sockfd = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
