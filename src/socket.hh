@@ -45,7 +45,6 @@ std::string prt_time();
 int set_daemon(const char* str_dir);
 void wait(int nbr_secs);
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //socket_t
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,9 +60,8 @@ public:
   int hostname_to_ip(const char* host_name, char* ip);
 
 public:
-  // socket descriptor 
-  socketfd_t m_sockfd;
-  sockaddr_in m_sockaddr_in; // client address (used to store return value of server accept())
+  socketfd_t m_sockfd; //socket descriptor 
+  sockaddr_in m_sockaddr_in; //client address (used to store return value of server accept())
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

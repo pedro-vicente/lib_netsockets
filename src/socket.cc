@@ -89,8 +89,7 @@ int set_daemon(const char* str_dir)
 //socket_t::socket_t()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-socket_t::socket_t() :
-  m_sockfd(-1)
+socket_t::socket_t() : m_sockfd(0)
 {
   memset(&m_sockaddr_in, 0, sizeof(m_sockaddr_in));
 }
@@ -295,12 +294,11 @@ tcp_server_t::~tcp_server_t()
 socket_t tcp_server_t::accept()
 {
   sockaddr_in addr_client; // client address
+  socketfd_t fd; //socket descriptor 
 #if defined (_MSC_VER)
   int len_addr; // length of client address data structure
-  SOCKET fd; // socket descriptor for client
 #else
   socklen_t len_addr;
-  int fd;
 #endif
 
   // set length of client address structure (in-out parameter)
