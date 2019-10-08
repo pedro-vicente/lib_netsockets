@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
 
     //create socket and open connection
     client.connect();
+    std::cout << "client connected  " << client.m_sockfd << "\n";
 
     //write something
     client.write_all(buf_s, strlen(buf_s));
@@ -62,9 +63,11 @@ int main(int argc, char* argv[])
 
     //close connection (server must read all)
     client.close();
+    std::cout << "client closed " << "\n";
 
     //create socket and open connection
     client.connect();
+    std::cout << "client connected  " << client.m_sockfd << "\n";
 
     //read
     int size = client.read_all(buf_r, 10);
@@ -73,6 +76,7 @@ int main(int argc, char* argv[])
 
     //close connection
     client.close();
+    std::cout << "client closed " << "\n";
   }
   return 0;
 }

@@ -77,7 +77,8 @@ int main(int argc, char* argv[])
           std::cout << "listening socket " << idx_act << " ready\n";
           socket_t socket = server.accept();
           char* str_ip = inet_ntoa(socket.m_sockaddr_in.sin_addr);
-          std::cout << prt_time() << "," << str_ip << "," << socket.m_sockfd << "\n";
+          std::cout << "accepted at " << prt_time() << "," << str_ip
+            << "," << socket.m_sockfd << "\n";
 
           //add the new incoming connection to the master read set
           FD_SET(socket.m_sockfd, &active_fds);
@@ -123,6 +124,27 @@ int main(int argc, char* argv[])
               FD_CLR(idx_act, &active_fds);
             }//socket.m_sockfd
           }//clients.size()
+
+          //check if any more connections were made
+          //client is expecting a reply, send it
+          for (size_t idx = 0; idx < clients.size(); idx++)
+          {
+            if (clients.at(idx).m_sockfd > 0)
+            {
+              std::cout << "connection from " << clients.at(idx).m_sockfd
+                << " at position " << idx << "\n";
+              char buf[255];
+              sprintf(buf, "67");
+              clients.at(idx).write_all(buf, strlen(buf));
+              std::cout << "server sent " << strlen(buf) << " bytes: " << buf << "\n";
+              //clear from active set
+              FD_CLR(clients.at(idx).m_sockfd, &active_fds);
+              //close
+              clients.at(idx).close();
+            }
+          }//check if any more connections were made
+
+
         }//data arriving on an already-connected socket
       }//FD_ISSET
     } //for max_fd
