@@ -134,27 +134,18 @@ int socket_t::write_all(const void* _buf, int size_buf)
   int sent_size; // size in bytes sent or -1 on error 
   int size_left; // size in bytes left to send 
   const int flags = 0;
-
   size_left = size_buf;
-
   while (size_left > 0)
   {
-    //write the data, being careful of interrupted system calls and partial results
-    do
-    {
-      sent_size = ::send(m_sockfd, buf, size_left, flags);
-    } while (-1 == sent_size && EINTR == errno);
-
+    sent_size = ::send(m_sockfd, buf, size_left, flags);
     if (-1 == sent_size)
     {
       std::cout << "send error: " << strerror(errno) << std::endl;
       return -1;
     }
-
     size_left -= sent_size;
     buf += sent_size;
   }
-
   return 1;
 }
 
@@ -165,6 +156,7 @@ int socket_t::write_all(const void* _buf, int size_buf)
 //http://man7.org/linux/man-pages/man2/recv.2.html
 //The recv(), recvfrom(), and recvmsg() calls are used to receive
 //messages from a socket.
+//NOTE: assumes : 1) blocking socket 2) socket closed , that makes ::recv return 0
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int socket_t::read_all(void* _buf, int size_buf)
@@ -174,15 +166,10 @@ int socket_t::read_all(void* _buf, int size_buf)
   int size_left; // size in bytes left to send 
   const int flags = 0;
   int total_recv_size = 0;
-
   size_left = size_buf;
   while (size_left > 0)
   {
-    //read the data, being careful of interrupted system calls and partial results
-    do
-    {
-      recv_size = ::recv(m_sockfd, buf, size_left, flags);
-    } while (-1 == recv_size && EINTR == errno);
+    recv_size = ::recv(m_sockfd, buf, size_left, flags);
     if (-1 == recv_size)
     {
       std::cout << "recv error: " << strerror(errno) << std::endl;
@@ -251,6 +238,14 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   if ((m_sockfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
   {
     std::cout << "socket error: " << std::endl;
+    exit(1);
+  }
+
+  //allow socket descriptor to be reuseable
+  int on = 1;
+  if (setsockopt(m_sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)& on, sizeof(on)) < 0)
+  {
+    std::cout << "setsockopt error: " << std::endl;
     exit(1);
   }
 
