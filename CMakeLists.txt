@@ -29,6 +29,8 @@ set(sources ${sources} src/ftp.hh)
 set(sources ${sources} src/ftp.cc)
 
 add_library(lib_netsockets ${sources})
+add_executable(pub_sub_client examples/pub_sub_client.cc)
+add_executable(pub_sub_server examples/pub_sub_server.cc)
 add_executable(block_client examples/block_client.cc)
 add_executable(block_server examples/block_server.cc)
 add_executable(select_server examples/select_server.cc)
