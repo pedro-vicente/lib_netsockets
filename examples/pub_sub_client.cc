@@ -9,7 +9,7 @@
 
 void usage()
 {
-  std::cout << "usage: /pub_sub_client -s server_ip" << std::endl;
+  std::cout << "usage: /pub_sub_client <-s server_ip>" << std::endl;
   exit(0);
 }
 
@@ -106,11 +106,30 @@ void publisher_t::notify(const subscriber_t& sub, const std::string& msg)
 //main
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main()
+int main(int argc, char* argv[])
 {
+  wait(1);
   std::string host_name("127.0.0.1");
   const unsigned short server_port_1 = 4000;
   const unsigned short server_port_2 = 5000;
+
+  for (int i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
+      case 's':
+        host_name = argv[i + 1];
+        i++;
+        break;
+      default:
+        usage();
+      }
+    }
+  }
+
+
   publisher_t pub;
   subscriber_t sub1(host_name, server_port_1, "sub1");
   subscriber_t sub2(host_name, server_port_2, "sub2");
@@ -119,7 +138,7 @@ int main()
   pub.add(&sub2);
   pub.notify(sub1, "message A");
   pub.notify(sub2, "message B");
-  pub.remove(&sub1);
+  pub.remove(&sub2);
   pub.notify(sub1, "message A");
   pub.notify(sub2, "message B");
   return 0;

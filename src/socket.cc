@@ -364,6 +364,7 @@ int tcp_client_t::connect(const char* host_name, const unsigned short server_por
 
   //store
   m_server_ip = server_ip;
+  m_server_port = server_port;
 
   // create a stream socket using TCP
   if ((m_sockfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
