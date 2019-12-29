@@ -10,17 +10,17 @@
 class subscriber_t
 {
 public:
-  subscriber_t(const std::string& name_) :
-    name(name_)
+  subscriber_t(const std::string& name_id_) :
+    name_id(name_id_)
   {};
   void update(const std::string& msg);
-  std::string message;
-  std::string name;
+  std::string name_id;
 };
 
+//send a message 
 void subscriber_t::update(const std::string& msg)
 {
-  message = msg;
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ class publisher_t
 {
 public:
   publisher_t() {}
-  void notify(const std::string& msg);
+  void notify(const subscriber_t& sub, const std::string& msg);
   std::vector<subscriber_t*> subscribers;
   void add(subscriber_t* sub);
   void remove(subscriber_t* sub);
@@ -39,23 +39,31 @@ public:
 
 void publisher_t::add(subscriber_t* sub)
 {
-  std::cout << "add " << sub->name << std::endl;
+  std::cout << "add " << sub->name_id << std::endl;
   subscribers.push_back(sub);
 }
 
 void publisher_t::remove(subscriber_t* sub)
 {
-  std::cout << "remove " << sub->name << std::endl;
+  std::cout << "remove " << sub->name_id << std::endl;
   subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), sub), subscribers.end());
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//publisher_t::notify
+//send a message to a subscriber
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void publisher_t::notify(const std::string& msg)
+void publisher_t::notify(const subscriber_t& sub, const std::string& msg)
 {
+  //iterate list of subscribers, send to the one that matches name id
   for (size_t idx = 0; idx < subscribers.size(); idx++)
   {
-    subscriber_t* sub = subscribers.at(idx);
-    std::cout << "update " << sub->name << " with " << msg << std::endl;
-    sub->update(msg);
+    subscriber_t* sub_ = subscribers.at(idx);
+    if (sub.name_id.compare(sub_->name_id) == 0)
+    {
+      std::cout << "update " << sub_->name_id << " with " << msg << std::endl;
+      sub_->update(msg);
+    }
   }
 }
 
@@ -71,9 +79,11 @@ int main()
 
   pub.add(&sub1);
   pub.add(&sub2);
-  pub.notify("message A");
+  pub.notify(sub1, "message A");
+  pub.notify(sub2, "message B");
   pub.remove(&sub1);
-  pub.notify("message B");
+  pub.notify(sub1, "message A");
+  pub.notify(sub2, "message B");
   return 0;
 }
 
