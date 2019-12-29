@@ -83,9 +83,12 @@ public:
 class tcp_client_t : public socket_t
 {
 public:
-  tcp_client_t(const char* host_name, const unsigned short server_port);
+  tcp_client_t();
   ~tcp_client_t();
   int connect();
+
+  tcp_client_t(const char* host_name, const unsigned short server_port);
+  int connect(const char* host_name, const unsigned short server_port);
 
 protected:
   std::string m_server_ip;

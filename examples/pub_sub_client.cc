@@ -1,7 +1,17 @@
-#include <vector>
-#include <algorithm>
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <vector>
+#include <algorithm>
+#include "socket.hh"
+
+void usage()
+{
+  std::cout << "usage: /pub_sub_client -s server_ip" << std::endl;
+  exit(0);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //subscriber_t
@@ -15,6 +25,8 @@ public:
   {};
   void update(const std::string& msg);
   std::string name_id;
+
+  tcp_client_t client;
 };
 
 //send a message 
@@ -73,6 +85,7 @@ void publisher_t::notify(const subscriber_t& sub, const std::string& msg)
 
 int main()
 {
+  std::string host_name("127.0.0.1");
   publisher_t pub;
   subscriber_t sub1("sub1");
   subscriber_t sub2("sub2");

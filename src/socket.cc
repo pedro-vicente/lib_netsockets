@@ -243,7 +243,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
 
   //allow socket descriptor to be reuseable
   int on = 1;
-  if (setsockopt(m_sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)& on, sizeof(on)) < 0)
+  if (setsockopt(m_sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on)) < 0)
   {
     std::cout << "setsockopt error: " << std::endl;
     exit(1);
@@ -256,7 +256,7 @@ tcp_server_t::tcp_server_t(const unsigned short server_port)
   server_addr.sin_port = htons(server_port);        // local port
 
   // bind to the local address
-  if (::bind(m_sockfd, (sockaddr*)& server_addr, sizeof(server_addr)) < 0)
+  if (::bind(m_sockfd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0)
   {
     //bind error: Permission denied
     //probably trying to bind a port under 1024. These ports usually require root privileges to be bound.
@@ -316,6 +316,18 @@ socket_t tcp_server_t::accept()
 //tcp_client_t::tcp_client_t
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+tcp_client_t::tcp_client_t()
+  : socket_t()
+{
+#if defined (_MSC_VER)
+  WSADATA ws_data;
+  if (WSAStartup(MAKEWORD(2, 0), &ws_data) != 0)
+  {
+    exit(1);
+  }
+#endif
+}
+
 tcp_client_t::tcp_client_t(const char* host_name, const unsigned short server_port)
   : socket_t(),
   m_server_port(server_port)
@@ -335,6 +347,48 @@ tcp_client_t::tcp_client_t(const char* host_name, const unsigned short server_po
 
   //store
   m_server_ip = server_ip;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//tcp_client_t::connect
+//::accept will block until a socket is opened with ::connect
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int tcp_client_t::connect(const char* host_name, const unsigned short server_port)
+{
+  struct sockaddr_in server_addr; // server address
+  char server_ip[100];
+
+  //get ip address from hostname
+  hostname_to_ip(host_name, server_ip);
+
+  //store
+  m_server_ip = server_ip;
+
+  // create a stream socket using TCP
+  if ((m_sockfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  {
+    std::cout << "socket error: " << std::endl;
+    return -1;
+  }
+
+  // construct the server address structure
+  memset(&server_addr, 0, sizeof(server_addr)); // zero out structure
+  server_addr.sin_family = AF_INET; // internet address family
+  if (inet_pton(AF_INET, m_server_ip.c_str(), &server_addr.sin_addr) <= 0) // server IP address
+  {
+    std::cout << "inet_pton error: " << strerror(errno) << std::endl;
+    return -1;
+  }
+  server_addr.sin_port = htons(m_server_port); // server port
+
+  // establish the connection to the server
+  if (::connect(m_sockfd, (struct sockaddr*) & server_addr, sizeof(server_addr)) < 0)
+  {
+    std::cout << "connect error: " << strerror(errno) << std::endl;
+    return -1;
+  }
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

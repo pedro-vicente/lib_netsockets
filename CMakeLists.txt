@@ -42,6 +42,8 @@ add_executable(json_server examples/json_server.cc examples/json_message.hh exam
 target_include_directories(json_server PRIVATE external/gason/src)
 
 set(lib_netsockets lib_netsockets)
+target_link_libraries (pub_sub_client ${lib_netsockets} ${LIBS})
+target_link_libraries (pub_sub_server ${lib_netsockets} ${LIBS})
 target_link_libraries (block_client ${lib_netsockets} ${LIBS})
 target_link_libraries (block_server ${lib_netsockets} ${LIBS})
 target_link_libraries (select_server ${lib_netsockets} ${LIBS})
