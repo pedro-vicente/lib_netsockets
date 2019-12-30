@@ -136,11 +136,11 @@ int main(int argc, char* argv[])
 
   pub.add(&sub1);
   pub.add(&sub2);
-  pub.notify(sub1, "message A");
-  pub.notify(sub2, "message B");
-  pub.remove(&sub2);
-  pub.notify(sub1, "message A");
-  pub.notify(sub2, "message B");
+  for (int i = 0; i < 3; i++)
+  {
+    pub.notify(sub1, "message_A_");
+    pub.notify(sub2, "message_B_");
+  }
   return 0;
 }
 
