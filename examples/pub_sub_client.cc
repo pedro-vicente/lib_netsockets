@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
 {
   wait(1);
   std::string host_name("127.0.0.1");
+  size_t nbr_itr = 2;
   const unsigned short server_port_1 = 4000;
   const unsigned short server_port_2 = 5000;
 
@@ -121,6 +122,10 @@ int main(int argc, char* argv[])
       {
       case 's':
         host_name = argv[i + 1];
+        i++;
+        break;
+      case 'n':
+        nbr_itr = std::stoi(argv[i + 1]);
         i++;
         break;
       default:
@@ -136,7 +141,7 @@ int main(int argc, char* argv[])
 
   pub.add(&sub1);
   pub.add(&sub2);
-  for (int i = 0; i < 3; i++)
+  for (size_t i = 0; i < nbr_itr; i++)
   {
     pub.notify(sub1, "message_A_");
     pub.notify(sub2, "message_B_");
