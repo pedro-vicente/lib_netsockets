@@ -25,7 +25,7 @@ public:
     server_port(server_port_),
     name_id(name_id_)
   {};
-  void update(const std::string& msg);
+  int update(const std::string& msg);
   tcp_client_t client;
   std::string host_name;
   unsigned short server_port;
@@ -37,24 +37,28 @@ public:
 //send a message 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void subscriber_t::update(const std::string& msg)
+int subscriber_t::update(const std::string& msg)
 {
   if (client.connect(host_name.c_str(), server_port) < 0)
   {
-    std::cout << "no connection to... " << host_name.c_str() << "\n";
-    return;
+    return -1;
   }
-  std::cout << "client connected  " << client.m_sockfd << "\n";
 
-  if (client.write_all(msg.c_str(), (int)msg.size()) < 0)
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+  //construct message
+  //header format:
+  //5 bytes that describe the destination subscriber (e.g "sub01")
+  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  std::string msg_(name_id);
+  msg_ += msg;
+  if (client.write_all(msg_.c_str(), (int)msg_.size()) < 0)
   {
-    client.close();
-    return;
+    return -1;
   }
-  std::cout << "client sent " << msg.size() << " bytes\n";
-
   //close connection (server must read all)
   client.close();
+  return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,16 +92,19 @@ void publisher_t::remove(subscriber_t* sub)
 //send a message to a subscriber
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void publisher_t::notify(const subscriber_t& sub, const std::string& msg)
+void publisher_t::notify(const subscriber_t& sub_, const std::string& msg)
 {
   //iterate list of subscribers, send to the one that matches name id
   for (size_t idx = 0; idx < subscribers.size(); idx++)
   {
-    subscriber_t* sub_ = subscribers.at(idx);
-    if (sub.name_id.compare(sub_->name_id) == 0)
+    subscriber_t* sub = subscribers.at(idx);
+    if (sub_.name_id.compare(sub->name_id) == 0)
     {
-      std::cout << "update " << sub_->name_id << " with " << msg << std::endl;
-      sub_->update(msg);
+      if (0) std::cout << "update " << sub->name_id << " with " << msg << std::endl;
+      if (sub->update(msg) < 0)
+      {
+
+      }
     }
   }
 }
@@ -134,17 +141,17 @@ int main(int argc, char* argv[])
     }
   }
 
-
   publisher_t pub;
-  subscriber_t sub1(host_name, server_port_1, "sub1");
-  subscriber_t sub2(host_name, server_port_2, "sub2");
+  subscriber_t sub1(host_name, server_port_1, "sub01");
+  subscriber_t sub2(host_name, server_port_2, "sub02");
 
   pub.add(&sub1);
   pub.add(&sub2);
   for (size_t i = 0; i < nbr_itr; i++)
   {
-    pub.notify(sub1, "message_A_");
-    pub.notify(sub2, "message_B_");
+    pub.notify(sub1, "messA");
+    pub.notify(sub2, "messB");
+    std::cout << i + 1 << " ";
   }
   return 0;
 }
