@@ -65,3 +65,5 @@ target_link_libraries (sqlite_server ${lib_netsockets} ${LIBS} ${CMAKE_DL_LIBS})
 target_include_directories(sqlite_client PRIVATE external/sqlite-3.18.0)
 target_include_directories(sqlite_client PRIVATE external/gason/src)
 target_link_libraries (sqlite_client ${lib_netsockets} ${LIBS} ${CMAKE_DL_LIBS})
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT lib_netsockets)

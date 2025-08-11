@@ -40,7 +40,7 @@ typedef int socketfd_t;
 //utils
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string str_extract(const std::string& str_in);
+
 std::string prt_time();
 int set_daemon(const char* str_dir);
 void wait(int nbr_secs);

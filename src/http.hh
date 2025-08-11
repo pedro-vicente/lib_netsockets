@@ -8,6 +8,7 @@ unsigned long long http_get_field(const std::string& str_field, const std::strin
 std::string http_get_body(const std::string& str_header);
 std::string http_get_method(const std::string& str_header);
 std::string escape_space(const std::string& str);
+std::string str_extract(const std::string& str_in);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //http_client_t

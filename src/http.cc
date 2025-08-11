@@ -258,3 +258,15 @@ std::string escape_space(const std::string& str)
   return str_out;
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//str_extract()
+//extract last component of file full path
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string str_extract(const std::string& str_in)
+{
+  size_t pos = str_in.find_last_of("/\\");
+  std::string str = str_in.substr(pos + 1, str_in.size());
+  return str;
+}
