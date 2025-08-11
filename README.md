@@ -18,30 +18,19 @@ Dependencies
 Building
 ------------
 
-## Building in Linux 
-
-Install dependencies
-
-[cmake](https://cmake.org/)
-
-Install packages with
-
-```
-sudo apt-get install cmake
-```
+## Building 
 
 Get source:
 <pre>
 git clone https://github.com/pedro-vicente/lib_netsockets.git
-cd build
-cmake ..
-make
 </pre>
 
-## Building in Windows 
-<pre>
-bld.bat
-</pre>
+CMake is used. On a bash shell, do
+
+```cmd
+./build.cmake.sh
+```
+
 
 # Usage
 lib_netsockets is C++ light wrapper for POSIX and Winsock sockets with implementation of TCP client/server using JSON messages,and HTTP, FTP clients.

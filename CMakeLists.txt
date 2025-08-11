@@ -1,7 +1,7 @@
 #CMake build, Pedro Vicente 
 #command line options for library dependencies
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.31)
 project (lib_netsockets)
 include(CheckCXXCompilerFlag)
 set(BUILD_SHARED_LIBRARIES OFF)
